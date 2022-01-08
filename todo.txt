@@ -1,0 +1,3 @@
+kada se stavka obradi, promeni TODO u DONE
+
+TODO: funkcija za parsiranje i ostale potrepstine prebaciti iz test.c u parse.c

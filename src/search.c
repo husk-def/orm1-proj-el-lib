@@ -48,4 +48,5 @@ int search_h(Header *hs, Header criteria, Header *ret, int size)
             /* skip, not matched */
         }
     }
+    return ret_cnt;
 }

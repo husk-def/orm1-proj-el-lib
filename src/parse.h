@@ -12,6 +12,7 @@
 
 
 int fill_struct(Header* niz_knjiga, int max_knjiga, int size);
+
 void flush_in();
 
 #endif

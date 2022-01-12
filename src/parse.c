@@ -2,6 +2,7 @@
 #include "parse.h"
 #include "header.h"
 #include <dirent.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -15,7 +16,7 @@ int fill_struct(Header* niz_knjiga, int max_knjiga, int size)
     int c;
     /*local counters, for books, parsing of header and parsing of id*/
     int i = 0;
-    char path[50]= "../biblioteka/";
+    char path[50]= "./biblioteka/";
     char header[BUF_LEN]; 
     char *token;
 
@@ -32,17 +33,25 @@ int fill_struct(Header* niz_knjiga, int max_knjiga, int size)
      *signaling it's at the end of directory if no errors have occured
      */
     de = readdir(dir);
-    while (de != NULL || i >= size) {       
+    
+    while (de != NULL || i > size) {       
         if(*(de->d_name) == '.') {
             /* skip . and .. */ 
+            --i;
         } else {
             strncpy(niz_knjiga[i].name, de->d_name, 50);
+            printf("-----\nwf: %s|-----\n", niz_knjiga[i].name);
             strncat(path, niz_knjiga[i].name, 50);
+            //sprintf(path, "biblioteka/%s", niz_knjiga[i].name);
+            printf("-----\nwd: %s|\n-----\n", path);
             fp = fopen(path, "r");
+            //fp = fopen(niz_knjiga[i].name, "r");
+            /* reset path */
+            path[13] = 0;
             if (fp == NULL) {
                 printf("fopen error\n");
-                closedir(dir);
-                return i;
+                //closedir(dir);
+                //return i;
             } else {
                 fgets(header, BUF_LEN, fp);
                 /* format is id|author|trunc_name|year| */

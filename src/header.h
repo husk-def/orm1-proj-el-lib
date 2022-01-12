@@ -13,6 +13,11 @@ typedef struct {
     int year; 
 } Header;
 
+/* init criteria function
+ * this function returns a struct with no set criteria
+ */
+Header init_criteria();
+
 /* header to string function
  * parses header h into string pointed by *str
  * ! IMPORTANT ! String size must be large enough

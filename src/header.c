@@ -2,6 +2,17 @@
 #include "header.h"
 #include <string.h>
 
+Header init_criteria()
+{
+    Header h;
+    h.author[0] = 0;
+    h.id = -1;
+    h.trunc_name[0] = 0;
+    h.name[0] = 0;
+    h.year = -1;
+    return h;
+}
+
 char * htos(Header h, char *str)
 {
     char buf[100];
@@ -22,7 +33,9 @@ void seth(Header *dst, const Header *src)
 void printh(const Header *h)
 {
     char buf[100];
-    printf("%s\n", htos(*h, buf));
+    //printf("%s\n", htos(*h, buf));
+    htos(*h, buf);
+    printf("%s\n", buf);
 }
 
 void printh_arr(const Header *harr, int size)

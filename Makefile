@@ -1,104 +1,48 @@
-WORKDIR = `pwd`
+IDIR = include
+# the compiler: gcc for C program, define as g++ for C++
+CC=gcc
 
-CC = gcc
-CXX = gcc
-LD = gcc
+# compiler flags:
+# -g    adds debugging information to the executable file
+# -Wall turns on most, but not all, compiler warnings
+CFLAGS=-ggdb -I$(IDIR) -Wall
 
-INC = -I inc
-CFLAGS = -Wall
-LIBDIR =
-# TODO: add necessary libs
-LIB = 
-LDFLAGS = -static
+ODIR=obj
+LDIR=lib
+BDIR=bin
 
-SRC = src
-
-#----------------------------------------------------------------------
-#-------------------- Makefile Debug configuration --------------------
-#----------------------------------------------------------------------
-INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -g
-RESINC_DEBUG = $(RESINC)
-RCFLAGS_DEBUG = $(RCFLAGS)
-LIBDIR_DEBUG = $(LIBDIR)
-LIB_DEBUG = $(LIB)
-LDFLAGS_DEBUG = $(LDFLAGS)
-OBJDIR_DEBUG = obj/Debug
-DEP_DEBUG =
-OUT_DEBUG = bin/Debug/test_app_pwm
-
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
-
-#----------------------------------------------------------------------
-#------------------- Makefile Release configuration -------------------
-#----------------------------------------------------------------------
-INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2
-RESINC_RELEASE = $(RESINC)
-RCFLAGS_RELEASE = $(RCFLAGS)
-LIBDIR_RELEASE = $(LIBDIR)
-LIB_RELEASE = $(LIB)
-LDFLAGS_RELEASE = $(LDFLAGS)
-OBJDIR_RELEASE = obj/Release
-DEP_RELEASE =
-OUT_RELEASE = bin/Release/test_app_pwm
-
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o
+# Define any libraries to link into executable (the math library -lm)
+# Use the -llibname option (this will link in libm.so)
+LIBS=-lm -pthread
 
 
-#----------------------------------------------------------------------
-#------------------------------- Targets ------------------------------
-#----------------------------------------------------------------------
+_OBJ = parse.o header.o search.o main.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-all: debug release
+_DEPS = header.h search.h parse.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
+# The -c flag says to generate the object file
+# The -o $@ says to put the output of the compilation in the file named on the left side of the :
+# Special macros $@ and $^ are the left and right sides of the :
+# The $< is the first item in the dependencies list, and the CFLAGS macro is defined above
+$(ODIR)/%.o: src/%.c $(BDIR) $(ODIR)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-clean: clean_debug clean_release
+# the build target executable:
+$(BDIR)/client: $(OBJ)
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
 
-#------------------------------------------------------------------
-#-------------------------- BUILD DEBUG ---------------------------
-#------------------------------------------------------------------
+# The .PHONY rule keeps make from doing something with a file named clean
+.PHONY: clean
 
-debug: before_debug out_debug after_debug
+# To start over from scratch, type 'make clean'.  This
+# removes the executable file, as well as old .o object
+# files and *~ backup files:
+clean:
+	rm -f $(BDIR)/client $(ODIR)/*.o *~ core $(INCDIR)/*~ 
 
-before_debug:
-	test -d bin/Debug || mkdir -p bin/Debug
-	test -d $(OBJDIR_DEBUG) || mkdir -p $(OBJDIR_DEBUG)
-
-out_debug: $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(LD) $(LIBDIR_DEBUG) -o $(OUT_DEBUG) $(OBJ_DEBUG)  $(LDFLAGS_DEBUG) $(LIB_DEBUG)
-
-$(OBJDIR_DEBUG)/main.o: $(SRC)/main.c
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c $(SRC)/main.c -o $(OBJDIR_DEBUG)/main.o
-
-after_debug:
-
-clean_debug:
-	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
-	rm -rf bin/Debug
-	rm -rf $(OBJDIR_DEBUG)
-
-#------------------------------------------------------------------
-#------------------------- BUILD RELEASE --------------------------
-#------------------------------------------------------------------
-
-release: before_release out_release after_release
-
-before_release:
-	test -d bin/Release || mkdir -p bin/Release
-	test -d $(OBJDIR_RELEASE) || mkdir -p $(OBJDIR_RELEASE)
-
-out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) $(LIBDIR_RELEASE) -o $(OUT_RELEASE) $(OBJ_RELEASE)  $(LDFLAGS_RELEASE) $(LIB_RELEASE)
-
-$(OBJDIR_RELEASE)/main.o: $(SRC)/main.c
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c $(SRC)/main.c -o $(OBJDIR_RELEASE)/main.o
-
-after_release:
-
-clean_release:
-	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
-	rm -rf bin/Release
-	rm -rf $(OBJDIR_RELEASE)
-
-.PHONY: before_debug after_debug clean_debug before_release after_release clean_release
+$(ODIR):
+	mkdir -p $(ODIR)
+$(BDIR):
+	mkdir -p $(BDIR)

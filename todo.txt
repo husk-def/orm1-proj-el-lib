@@ -1,4 +1,6 @@
 kada se stavka obradi, promeni TODO u DONE
 
 DONE: funkcija za parsiranje i ostale potrepstine prebaciti iz test.c u parse.c
-TODO: proveriti funkcionalnost programa
+DONE: proveriti funkcionalnost programa
+TODO: dodati jos fajlova u biblioteku
+TODO: 

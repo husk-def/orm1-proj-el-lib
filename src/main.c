@@ -12,7 +12,7 @@ int main()
     Header criteria;
 
     printf("***********fill_struct************\n\n");
-    size = fill_struct(arr, 0, 30);
+    size = fill_struct(arr, 30);
     printf("\nfetched %d files.\n\n***********printh_arr*************\n\n", size);
     printh_arr(arr, size);
     printf("\n\n");

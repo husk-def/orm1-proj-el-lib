@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-int fill_struct(Header* niz_knjiga, int max_knjiga, int size)
+int fill_struct(Header* niz_knjiga, int size)
 { 
     /*pointer to a file stream inside a directory*/
     DIR *dir;   

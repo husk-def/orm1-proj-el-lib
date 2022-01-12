@@ -10,8 +10,13 @@
 #include "header.h"
 
 
-
-int fill_struct(Header* niz_knjiga, int max_knjiga, int size);
+/* fill_struct function
+ * this function goes through biblioteka dir and
+ * fetches at most size book headers, putting info
+ * into header struct
+ *  @return number of fetched headers
+ */
+int fill_struct(Header* niz_knjiga, int size);
 
 void flush_in();
 

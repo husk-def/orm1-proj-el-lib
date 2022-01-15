@@ -2,6 +2,7 @@
 #include "search.h"
 #include "parse.h"
 #include "header.h"
+#include "download_server.h"
 
 int main()
 {
@@ -70,6 +71,16 @@ int main()
     printh(&criteria);
     printf("\n***********matched************ n_matched = %d\n", n_matched);
     printh_arr(tmp, n_matched);
+
+////////////////////////////////////////////////////////////////////
+    /*test download*/
+    printh(arr);
+    criteria = init_criteria();
+    criteria.id = 1;
+    char test_string[200];
+    download_server(arr, criteria, test_string, size);
+    printf("\n\n%s\n", test_string);
+    
 
 
 }

@@ -3,4 +3,7 @@ kada se stavka obradi, promeni TODO u DONE
 DONE: funkcija za parsiranje i ostale potrepstine prebaciti iz test.c u parse.c
 DONE: proveriti funkcionalnost programa
 TODO: dodati jos fajlova u biblioteku
-TODO: 
+TODO: Zavrsiti download_client
+TODO: dodati dinamicku alokaciju output string-a iz download_server
+TODO: napraviti algoritam koji parsira output string po 1024 char. Ovde nije potrebna dinamicka alokacija, ako se desi da je poslednji string manji od 1024, nije bitno, samo upisemo opet u buffer.
+TODO: napraviti algoritam koji sada prima ove stringove jedan po jedan i pakuje u novi string iz kog ce se upisivati u novi fajl sa klijentske strane

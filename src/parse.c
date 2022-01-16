@@ -13,7 +13,6 @@ int fill_struct(Header* niz_knjiga, int size)
     /*struct that stores the characteristicts of a file*/
     struct dirent *de; 
     FILE* fp;
-    int c;
     /*local counters, for books, parsing of header and parsing of id*/
     int i = 0;
     char path[50]= "./biblioteka/";

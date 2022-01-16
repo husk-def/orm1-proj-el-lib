@@ -15,7 +15,7 @@ Header init_criteria()
 
 char * htos(Header h, char *str)
 {
-    char buf[100];
+    char buf[200];
     sprintf(buf, "%s|%d|%s|%s|%d", h.name, h.id, h.author, h.trunc_name, h.year);
     strcpy(str, buf);
     return str;
@@ -32,7 +32,7 @@ void seth(Header *dst, const Header *src)
 
 void printh(const Header *h)
 {
-    char buf[100];
+    char buf[200];
     //printf("%s\n", htos(*h, buf));
     htos(*h, buf);
     printf("%s\n", buf);

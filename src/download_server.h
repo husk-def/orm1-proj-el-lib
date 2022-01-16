@@ -9,7 +9,14 @@
 #include "header.h"
 #include "search.h"
 
-
-void download_server(Header* a, Header criteria, char* output, char* output_name, int size);
+/* download a book from server function
+ * parameters:
+ *  a - pointer to header of a book to be downloaded
+ *  output - output string to be sent afterwards
+ *  output_name - name of a book
+ *  path - path of a certain book
+ * 
+ */
+void download_server(const Header *a, char *output, char *output_name, const char *path);
 
 #endif

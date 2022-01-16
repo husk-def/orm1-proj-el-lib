@@ -3,6 +3,10 @@
 #include "parse.h"
 #include "header.h"
 #include "download_server.h"
+#include <sys/stat.h>
+#include <math.h>
+
+#define TCP_SUBSTRING_LEN (10)
 
 int main()
 {
@@ -11,6 +15,10 @@ int main()
     Header arr[30];
     Header tmp[30];
     Header criteria;
+    char output[100];
+    char path[50] = "./biblioteka/";
+    struct stat st;
+    int filesize;
 
     printf("***********fill_struct************\n\n");
     size = fill_struct(arr, 30);
@@ -78,36 +86,53 @@ int main()
     criteria = init_criteria();
     criteria.id = 2;
     /*test_name kao prva poruka da klijent zna kako da imenuje novi fajl, ostatak sadrzaja je u test_string*/
-    char test_string[200];
-    char test_name[30]; 
-    download_server(arr, criteria, test_string, test_name, size);
+    char *test_string;
+    char test_name[50]; 
+
+    n_matched = search_h(arr, criteria, tmp, size);
+    if (n_matched < 1) {
+        strcpy(output, "download_server: The book with the given id doesn't exist\n");
+    } else {
+        /* fetch only one book */
+        strcat(path, tmp[0].name);
+        stat(path, &st);
+        filesize = st.st_size;
+        printf("\nsizeof %s is %d\n", path, filesize);
+    }
+
+    test_string = (char *)calloc(filesize, sizeof(char));
+    if (test_string == NULL) {
+        printf("calloc unsuccessful\n");
+    }
+
+    download_server(&tmp[0], test_string, test_name, path);
     
-    printf("\n%s\n%s\n",test_name, test_string);
+    printf("***************************************\n\nfilename:%s\ncontent->\n%s\n****************************",test_name, test_string);
 
     ////////////////////algoritam za podelu i slanje poruke/////////////////////
     
-    int bufferSize = 10;
     int k = 0;
     char recvString[200];
-    char sendBuffer[bufferSize];
-    printf("VELICINA BUFFERA : %i !!", strlen(sendBuffer));
-    int num_of_sends = strlen(test_string) / bufferSize;
-    if( (strlen(test_string) % bufferSize) != 0) num_of_sends++;
+    char sendBuffer[TCP_SUBSTRING_LEN];
+    int num_of_sends = ceil(filesize / (float)(TCP_SUBSTRING_LEN - 1));
+    printf("\nnumber of substrings = %d\n\n", num_of_sends);
 
-
-    strcat(test_string, "&"); //char koji oznacava kraj falja
-    memset(sendBuffer, '\0', bufferSize);
+    //strcat(test_string, "&"); //char koji oznacava kraj falja
+    memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
     for(int i = 0; i < num_of_sends; i++) {
         /*BUG!!! +3 iz nekog razloga reseva, popunjava rupu u bufferu jer iz nekog razloga postane velicine 13*/
-        for(int j = 0; j < bufferSize+3; j++) {
-            if(test_string[k] == '&') break;          
+        for(int j = 0; j < TCP_SUBSTRING_LEN - 1; j++) {
+            if(test_string[k] == 0) break;          
             sendBuffer[j] = test_string[k];
             k++;
         }
+        sendBuffer[TCP_SUBSTRING_LEN - 1] = 0;
         /*umesto strcat() treba da ide sendv()*/
         strcat(recvString, sendBuffer);
-        memset(sendBuffer, '\0', bufferSize);
+        memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
     }
     printf("\n%s\n", recvString);
     
+    /* free calloc-ed buffer */
+    free(test_string);
 }

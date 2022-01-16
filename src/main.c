@@ -94,6 +94,7 @@ int main()
     int num_of_sends = strlen(test_string) / bufferSize;
     if( (strlen(test_string) % bufferSize) != 0) num_of_sends++;
 
+
     strcat(test_string, "&"); //char koji oznacava kraj falja
     memset(sendBuffer, '\0', bufferSize);
     for(int i = 0; i < num_of_sends; i++) {

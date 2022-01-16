@@ -9,6 +9,7 @@
 #include "header.h"
 #include "search.h"
 
-void download_server(Header* a, Header criteria, char* output, int size);
+
+void download_server(Header* a, Header criteria, char* output, char* output_name, int size);
 
 #endif

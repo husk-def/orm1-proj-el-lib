@@ -1,6 +1,7 @@
 #include "download_server.h"
 
-void download_server(Header* a, Header criteria, char* output, int size)
+void download_server(Header* a, Header criteria, char* output, char* output_name,  int size)
+
 {
     Header found;
     FILE* fp;
@@ -18,6 +19,9 @@ void download_server(Header* a, Header criteria, char* output, int size)
 
     strcpy(filename, found.name);         
     strcat(path, filename);
+
+    strcpy(output_name, filename);
+
     stat(path, &st);
     stringSize = st.st_size;
     printf("%i", stringSize);

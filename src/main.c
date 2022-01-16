@@ -76,11 +76,38 @@ int main()
     /*test download*/
     printh(arr);
     criteria = init_criteria();
-    criteria.id = 1;
+    criteria.id = 2;
+    /*test_name kao prva poruka da klijent zna kako da imenuje novi fajl, ostatak sadrzaja je u test_string*/
     char test_string[200];
-    download_server(arr, criteria, test_string, size);
-    printf("\n\n%s\n", test_string);
+    char test_name[30]; 
+    download_server(arr, criteria, test_string, test_name, size);
     
+    printf("\n%s\n%s\n",test_name, test_string);
+
+    ////////////////////algoritam za podelu i slanje poruke/////////////////////
+    
+    int bufferSize = 10;
+    int k = 0;
+    char recvString[200];
+    char sendBuffer[bufferSize];
+    printf("VELICINA BUFFERA : %i !!", strlen(sendBuffer));
+    int num_of_sends = strlen(test_string) / bufferSize;
+    if( (strlen(test_string) % bufferSize) != 0) num_of_sends++;
 
 
+    strcat(test_string, "&"); //char koji oznacava kraj falja
+    memset(sendBuffer, '\0', bufferSize);
+    for(int i = 0; i < num_of_sends; i++) {
+        /*BUG!!! +3 iz nekog razloga reseva, popunjava rupu u bufferu jer iz nekog razloga postane velicine 13*/
+        for(int j = 0; j < bufferSize+3; j++) {
+            if(test_string[k] == '&') break;          
+            sendBuffer[j] = test_string[k];
+            k++;
+        }
+        /*umesto strcat() treba da ide sendv()*/
+        strcat(recvString, sendBuffer);
+        memset(sendBuffer, '\0', bufferSize);
+    }
+    printf("\n%s\n", recvString);
+    
 }

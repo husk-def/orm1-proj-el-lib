@@ -135,9 +135,11 @@ int main()
     
     /* free calloc-ed buffer */
     free(test_string);
+
     /*!!!! sendv(test_name) <------ potrebno je na pocetku ili kraju poslati i poruku koja sadrzi ime fajla*/
 
     //////////////////////test download_client//////////////////////////////
     char client_path[50] = "./biblioteka_client/";
     download_client(recvString, test_name, client_path);
+
 }

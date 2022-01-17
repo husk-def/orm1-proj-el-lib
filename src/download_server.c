@@ -1,35 +1,23 @@
 #include "download_server.h"
+#include <stdlib.h>
 
-void download_server(Header* a, Header criteria, char* output, char* output_name,  int size)
+void download_server(const Header *a, char *output, char *output_name, const char *path)
 {
-    Header found;
     FILE* fp;
-    int c;
-    char filename[30];
-    char path[50]= "./biblioteka/";
-    struct stat st;
-    int stringSize;
+    int c = 0;
 
-    int val = search_h(a, criteria, &found, size);
-    if(!val) {
-        strcpy(output, "The book with the given id doesn't exist");
-        return;
-    }
+    strcpy(output_name, a->name);
 
-    strcpy(filename, found.name);         
-    strcat(path, filename);
-    strcpy(output_name, filename);
-    stat(path, &st);
-    stringSize = st.st_size;
-    printf("%i", stringSize);
     fp = fopen(path, "r");
     if (fp == NULL) {
-        printf("fopen error\n");
+        printf("download_server: fopen error\n");
     } else {
+        /* sizeof output is equal to sizeof file, no need to control */
         while(1) {
-            c = fgetc(fp);
-            strcat(output, &c);
+            output[c] = fgetc(fp);
+            //strcat(output, &c);
             if(feof(fp)) break;
+            ++c;
         }
         fclose(fp);
     }

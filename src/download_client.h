@@ -5,6 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void download_client(char* input);
+void download_client(char* input, char* input_name, const char* library_path);
 
 #endif

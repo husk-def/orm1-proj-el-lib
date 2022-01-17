@@ -141,5 +141,4 @@ int main()
     //////////////////////test download_client//////////////////////////////
     char client_path[50] = "./biblioteka_client/";
     download_client(recvString, test_name, client_path);
-
 }

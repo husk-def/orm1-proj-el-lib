@@ -33,16 +33,16 @@ Napomene:
  
 Sintaksa instrukcija:
 
- • login [id:your_identification_number] [mypsw:your_password]
+ • login id password #id is an uint
 
  • logout
 
  • searchall
 
- • search [id:ID] [author:AUTHOR] [trunc:truncated_name] [year:YEAR]
+ • search [i:ID] [a:AUTHOR] [t:truncated_name] [y:YEAR]
 
  • checkstatus
 
- • download [id:ID]
+ • download [i:ID]
 
 

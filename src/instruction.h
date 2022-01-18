@@ -3,12 +3,16 @@
 #define INSTRUCTION_H
 
 #include "header.h"
+#include "user.h"
+
+union Info {
+    User usr;
+    Header hdr;
+};
 
 typedef struct {
     char instrname[7];
-    char id[6];
-    char pass[10];
-    Header hdr;
+    union Info inf;
 } Instruction;
 
 void print_instr(const Instruction *i);

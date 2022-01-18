@@ -1,10 +1,12 @@
 
+#include "login.h"
 #include "search.h"
 #include "parse.h"
 #include "header.h"
 #include "download_server.h"
 #include "download_client.h"
 #include "instruction.h"
+#include <string.h>
 #include <sys/stat.h>
 #include <math.h>
 
@@ -149,4 +151,26 @@ int main()
     // printf("\n\n***************test download_client**************\n");
     // char client_path[50] = "./biblioteka_client/";
     // download_client(recvString, test_name, client_path);
+
+////////////////////////////////////////////////////////////////////////////////////
+    Instruction i;
+    i.inf.hdr = init_criteria();
+    strcpy(i.instrname, "login");
+    strcpy(i.inf.usr.id, "baja");
+    strcpy(i.inf.usr.pass, "bajinasifra");
+    print_instr(&i);
+///////////////////////////////////////////////////////////////////////////////////
+    int code;
+    printf("********************test with existing user, correct password*********************\n");
+    code = login(&i);
+    printf("error code: %d\n", code);
+    printf("********************test with existing user, incorrect password*********************\n");
+    strcpy(i.inf.usr.pass, "nebajinasifra");
+    code = login(&i);
+    printf("error code: %d\n", code);
+    printf("********************test with non-existing user, should create a new file*********************\n");
+    strcpy(i.inf.usr.id, "novikorisnik");
+    code = login(&i);
+    printf("error code: %d\n", code);
+
 }

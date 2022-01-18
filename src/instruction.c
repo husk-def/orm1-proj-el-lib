@@ -1,6 +1,7 @@
 
 #include "instruction.h"
 #include "header.h"
+#include "user.h"
 #include <stdio.h>
 
 void print_instr(const Instruction *i)
@@ -8,14 +9,14 @@ void print_instr(const Instruction *i)
     char str[200];
     char tmp[200];
     if (strncmp(i->instrname, "login", 6) == 0) {
-        sprintf(str, "login %s %s", i->id, i->pass);
+        sprintf(str, "login %s", utos(&i->inf.usr, tmp));
     } else if (strncmp(i->instrname, "logout", 7) == 0) {
         sprintf(str, "logout");
     } else if (strncmp(i->instrname, "schall", 7) == 0) {
         sprintf(str, "schall");
     } else if (strncmp(i->instrname, "search", 7) == 0) {
         sprintf(str, "search");
-        strcat(str, htos(i->hdr, tmp));
+        strcat(str, htos(i->inf.hdr, tmp));
     } else if (strncmp(i->instrname, "chkst", 6) == 0) {
         sprintf(str, "chkst");
     } else if (strncmp(i->instrname, "downl", 6) == 0) {
@@ -23,5 +24,5 @@ void print_instr(const Instruction *i)
     } else {
         sprintf(str, "invalid instruction");
     }
-    printf("%s", str);
+    printf("%s\n", str);
 }

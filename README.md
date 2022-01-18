@@ -33,16 +33,16 @@ Napomene:
  
 Sintaksa instrukcija:
 
- • login id password #id is an uint
+ • login id password
 
  • logout
 
- • searchall
+ • schall
 
  • search [i:ID] [a:AUTHOR] [t:truncated_name] [y:YEAR]
 
- • checkstatus
+ • chkst
 
- • download [i:ID]
+ • downl id
 
 

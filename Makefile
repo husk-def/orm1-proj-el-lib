@@ -1,48 +1,17 @@
-IDIR = include
-# the compiler: gcc for C program, define as g++ for C++
-CC=gcc
-
-# compiler flags:
-# -g    adds debugging information to the executable file
-# -Wall turns on most, but not all, compiler warnings
-CFLAGS=-ggdb -I$(IDIR) -Wall
-
-ODIR=obj
-LDIR=lib
-BDIR=bin
-
-# Define any libraries to link into executable (the math library -lm)
-# Use the -llibname option (this will link in libm.so)
-LIBS=-lm -pthread
-
-
-_OBJ = parse.o header.o search.o download_server.o download_client.o main.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
-
-_DEPS = header.h search.h parse.h download_server.h download_client.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
-# The -c flag says to generate the object file
-# The -o $@ says to put the output of the compilation in the file named on the left side of the :
-# Special macros $@ and $^ are the left and right sides of the :
-# The $< is the first item in the dependencies list, and the CFLAGS macro is defined above
-$(ODIR)/%.o: src/%.c $(BDIR) $(ODIR)
-	$(CC) -c -o $@ $< $(CFLAGS)
-
-# the build target executable:
-$(BDIR)/client: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
-
-
-# The .PHONY rule keeps make from doing something with a file named clean
-.PHONY: clean
-
-# To start over from scratch, type 'make clean'.  This
-# removes the executable file, as well as old .o object
-# files and *~ backup files:
+# To "make"       run in terminal: "make client" or "make server"
+# To "make clean" run in terminal: "make client_clean" or "make server_clean"
+.PHONY: default
+default:
+	make client
+	make server
+server:
+	make -f makefile.server
+server_clean:
+	make clean -f makefile.server
+client:
+	make -f makefile.client
+client_clean:
+	make clean -f makefile.client
 clean:
-	rm -f $(BDIR)/client $(ODIR)/*.o *~ core $(INCDIR)/*~ 
-
-$(ODIR):
-	mkdir -p $(ODIR)
-$(BDIR):
-	mkdir -p $(BDIR)
+	make client_clean
+	make server_clean

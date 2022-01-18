@@ -3,6 +3,7 @@
 #include "parse.h"
 #include "header.h"
 #include "download_server.h"
+#include "download_client.h"
 #include <sys/stat.h>
 #include <math.h>
 

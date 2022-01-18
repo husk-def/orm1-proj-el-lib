@@ -4,6 +4,7 @@
 #include "header.h"
 #include "download_server.h"
 #include "download_client.h"
+#include "instruction.h"
 #include <sys/stat.h>
 #include <math.h>
 
@@ -120,14 +121,19 @@ int main()
 
     //strcat(test_string, "&"); //char koji oznacava kraj falja
     memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
-    for(int i = 0; i < num_of_sends; i++) {
+    for (int i = 0; i < num_of_sends; i++) {
         /*BUG!!! +3 iz nekog razloga reseva, popunjava rupu u bufferu jer iz nekog razloga postane velicine 13*/
-        for(int j = 0; j < TCP_SUBSTRING_LEN - 1; j++) {
-            if(test_string[k] == 0) break;          
+        for (int j = 0; j < TCP_SUBSTRING_LEN - 1; j++) {
+            if (test_string[k] == 0) {
+                sendBuffer[j] = test_string[k];
+                break;
+            }          
             sendBuffer[j] = test_string[k];
             k++;
         }
-        sendBuffer[TCP_SUBSTRING_LEN - 1] = 0;
+        if (test_string[k] != 0) {
+            sendBuffer[TCP_SUBSTRING_LEN - 1] = 0;
+        }
         /*umesto strcat() treba da ide sendv()*/
         strcat(recvString, sendBuffer);
         memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
@@ -140,6 +146,7 @@ int main()
     /*!!!! sendv(test_name) <------ potrebno je na pocetku ili kraju poslati i poruku koja sadrzi ime fajla*/
 
     //////////////////////test download_client//////////////////////////////
-    char client_path[50] = "./biblioteka_client/";
-    download_client(recvString, test_name, client_path);
+    // printf("\n\n***************test download_client**************\n");
+    // char client_path[50] = "./biblioteka_client/";
+    // download_client(recvString, test_name, client_path);
 }

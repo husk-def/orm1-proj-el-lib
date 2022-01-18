@@ -33,7 +33,7 @@ Napomene:
  
 Sintaksa instrukcija:
 
- • login id password
+ • login id password 
 
  • logout
 

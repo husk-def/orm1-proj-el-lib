@@ -32,6 +32,7 @@ Napomene:
  • N korisnika može istovremeno da dobavlja sadržaj istog izdanja elektronske biblioteke.
  
 Sintaksa instrukcija:
+
  • login [id:your_identification_number] [mypsw:your_password]
 
  • logout
@@ -43,5 +44,5 @@ Sintaksa instrukcija:
  • checkstatus
 
  • download [id:ID]
- 
+
 

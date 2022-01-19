@@ -33,33 +33,45 @@ void print_instr(const Instruction *i)
 {
     char str[200];
     char tmp[200];
-    if (i->instr == LOGIN) {
-        sprintf(str, "instruction -> login\t\t\tuser: %s", utos(&i->inf.usr, tmp));
-    } else if (i->instr == LOGOUT) {
-        sprintf(str, "instruction -> logout");
-    } else if (i->instr == SCHALL) {
-        sprintf(str, "instruction -> schall");
-    } else if (i->instr == CHKST) {
-        sprintf(str, "instruction -> chkst");
-    } else if (i->instr == DOWNL) {
-        sprintf(str, "instruction -> downl\t\t\tcriteria: %d", i->inf.hdr.id);
-    } else if (i->instr == SEARCH) {
-        sprintf(str, "instruction -> search\t\t\tcriteria: ");
-        strcat(str, htos(i->inf.hdr, tmp));
-    } else if (i->instr == SEARCH_I) {
-        sprintf(str, "instruction -> search by id\t\tcriteria: ");
-        strcat(str, htos(i->inf.hdr, tmp));
-    } else if (i->instr == SEARCH_A) {
-        sprintf(str, "instruction -> search by author\t\tcriteria: ");
-        strcat(str, htos(i->inf.hdr, tmp));
-    } else if (i->instr == SEARCH_T) {
-        sprintf(str, "instruction -> search by trunc_name\tcriteria: ");
-        strcat(str, htos(i->inf.hdr, tmp));
-    } else if (i->instr == SEARCH_Y) {
-        sprintf(str, "instruction -> search by year\t\tcriteria: ");
-        strcat(str, htos(i->inf.hdr, tmp));
-    } else {
-        sprintf(str, "instruction -> invalid instruction");
+    switch (i->instr) {    
+        case LOGIN:
+            sprintf(str, "instruction -> login\t\t\tuser: %s", utos(&i->inf.usr, tmp));
+            break;
+        case LOGOUT:
+            sprintf(str, "instruction -> logout");
+            break;
+        case SCHALL:
+            sprintf(str, "instruction -> schall");
+            break;
+        case CHKST:
+            sprintf(str, "instruction -> chkst");
+            break;
+        case DOWNL:
+            sprintf(str, "instruction -> downl\t\t\tcriteria: %d", i->inf.hdr.id);
+            break;
+        case SEARCH:
+            sprintf(str, "instruction -> search\t\t\tcriteria: ");
+            strcat(str, htos(i->inf.hdr, tmp));
+            break;
+        case SEARCH_I:
+            sprintf(str, "instruction -> search by id\t\tcriteria: ");
+            strcat(str, htos(i->inf.hdr, tmp));
+            break;
+        case SEARCH_A:
+            sprintf(str, "instruction -> search by author\t\tcriteria: ");
+            strcat(str, htos(i->inf.hdr, tmp));
+            break;
+        case SEARCH_T:
+            sprintf(str, "instruction -> search by trunc_name\tcriteria: ");
+            strcat(str, htos(i->inf.hdr, tmp));
+            break;
+        case SEARCH_Y:
+            sprintf(str, "instruction -> search by year\t\tcriteria: ");
+            strcat(str, htos(i->inf.hdr, tmp));
+            break;
+        default:
+            sprintf(str, "instruction -> invalid instruction");
+            break;
     }
     printf("%s\n", str);
 }
@@ -103,7 +115,7 @@ void fetch_args(const char *str, Instruction *i)
             sscanf(str, "search t:%s", i->inf.hdr.trunc_name);
             break;
         case SEARCH_Y:
-            sscanf(str, "search a:%d", &i->inf.hdr.year);
+            sscanf(str, "search y:%d", &i->inf.hdr.year);
             break;
         default:
             break;

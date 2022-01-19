@@ -35,42 +35,37 @@ void print_instr(const Instruction *i)
     char tmp[200];
     switch (i->instr) {    
         case LOGIN:
-            sprintf(str, "instruction -> login\t\t\tuser: %s", utos(&i->inf.usr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> login\t\t\tuser: %s" ANSI_COLOR_RESET, utos(&i->inf.usr, tmp));
             break;
         case LOGOUT:
-            sprintf(str, "instruction -> logout");
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> logout" ANSI_COLOR_RESET);
             break;
         case SCHALL:
-            sprintf(str, "instruction -> schall");
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> schall" ANSI_COLOR_RESET);
             break;
         case CHKST:
-            sprintf(str, "instruction -> chkst");
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> chkst" ANSI_COLOR_RESET);
             break;
         case DOWNL:
-            sprintf(str, "instruction -> downl\t\t\tcriteria: %d", i->inf.hdr.id);
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> downl\t\t\tcriteria: %d" ANSI_COLOR_RESET, i->inf.hdr.id);
             break;
         case SEARCH:
-            sprintf(str, "instruction -> search\t\t\tcriteria: ");
-            strcat(str, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> search\t\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         case SEARCH_I:
-            sprintf(str, "instruction -> search by id\t\tcriteria: ");
-            strcat(str, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by id\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         case SEARCH_A:
-            sprintf(str, "instruction -> search by author\t\tcriteria: ");
-            strcat(str, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by author\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         case SEARCH_T:
-            sprintf(str, "instruction -> search by trunc_name\tcriteria: ");
-            strcat(str, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by trunc_name\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         case SEARCH_Y:
-            sprintf(str, "instruction -> search by year\t\tcriteria: ");
-            strcat(str, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by year\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         default:
-            sprintf(str, "instruction -> invalid instruction");
+            sprintf(str, ANSI_COLOR_RED "instruction -> invalid instruction" ANSI_COLOR_RESET);
             break;
     }
     printf("%s\n", str);

@@ -5,6 +5,7 @@
 #include <regex.h>
 #include "header.h"
 #include "user.h"
+#include "colors.h"
 
 typedef enum 
 {

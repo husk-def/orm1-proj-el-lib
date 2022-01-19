@@ -39,7 +39,7 @@ Sintaksa instrukcija:
 
  • schall
 
- • search [i:ID] [a:AUTHOR] [t:truncated_name] [y:YEAR]
+ • search i:ID a:AUTHOR t:truncated_name y:YEAR
 
  • chkst
 

@@ -1,16 +1,7 @@
 
-#include "login.h"
-#include "search.h"
-#include "parse.h"
 #include "header.h"
-#include "download_server.h"
-#include "download_client.h"
+#include "includes.h"
 #include "instruction.h"
-#include <string.h>
-#include <sys/stat.h>
-#include <math.h>
-
-#define TCP_SUBSTRING_LEN (10)
 
 int main()
 {
@@ -155,11 +146,11 @@ int main()
 ////////////////////////////////////////////////////////////////////////////////////
     Instruction i;
     i.inf.hdr = init_criteria();
-    strcpy(i.instrname, "login");
+    i.instr = LOGIN;
     strcpy(i.inf.usr.id, "baja");
     strcpy(i.inf.usr.pass, "bajinasifra");
     print_instr(&i);
-///////////////////////////////////////////////////////////////////////////////////
+
     int code;
     printf("********************test with existing user, correct password*********************\n");
     code = login(&i);
@@ -172,5 +163,52 @@ int main()
     strcpy(i.inf.usr.id, "novikorisnik");
     code = login(&i);
     printf("error code: %d\n", code);
+///////////////////////////////////////////////////////////////////////////////////
+    /* regex test */
+    Instruction instrukcija;
+    instr_t retval;
 
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search i:24", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search a:mikrolad prezime", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search f:24", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("login baja bajinasifra", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("logout", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("schall", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("chkst", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search i:23 a:mikrolad fifi t:shortbook y:2019", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search y:2023", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("search t:kratkoime", &instrukcija);
+    print_instr(&instrukcija);
+
+    instrukcija.inf.hdr = init_criteria();
+    retval = parse_instr("downl 24", &instrukcija);
+    print_instr(&instrukcija);
 }

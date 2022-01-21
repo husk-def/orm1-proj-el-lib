@@ -7,9 +7,34 @@ typedef struct {
     char pass[16]; 
 } User;
 
+void init_user(User *u);
+
+void init_users(User *us, int size);
+
+int user_match(const User *u1, const User *u2);
+
 /* user struct to string function
- * string will bi returned via str pointer to char array
+ * string will be returned via str pointer to char array
  */
 char *utos(const User *usr, char* str);
+
+void print_user(const User *u);
+
+void print_users(const User *us, int size);
+
+/*
+ * 0 - unique
+ * 1 - not unique
+ */
+int unique_user(const User *us, const User *u, int size);
+
+/*
+ * -1  - not added
+ * any - added on any place
+ */
+int add_user(User *us, const User *u, int size);
+
+void remove_user(User *us, int code);
+
 
 #endif //USER_H

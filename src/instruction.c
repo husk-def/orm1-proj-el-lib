@@ -2,6 +2,7 @@
 #include "instruction.h"
 #include "header.h"
 #include "user.h"
+#include <regex.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -29,52 +30,62 @@ char instr_regex[10][90] =
     "^search y:[0-9]{1,9}[ \t\n]*$",
 };
 
+inline void init_instruction(Instruction *i)
+{
+    i->instr = NO_INSTR;
+}
+
+
+
 void print_instr(const Instruction *i)
 {
     char str[200];
     char tmp[200];
+    //sprintf(tmp, "instruction -> ");
     switch (i->instr) {    
         case LOGIN:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> login\t\t\tuser: %s" ANSI_COLOR_RESET, utos(&i->inf.usr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "login\t\t\tuser: \"%s\", password: \"%s\"" ANSI_COLOR_RESET, i->inf.usr.id, i->inf.usr.pass);
             break;
         case LOGOUT:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> logout" ANSI_COLOR_RESET);
+            sprintf(str, ANSI_COLOR_GREEN "logout" ANSI_COLOR_RESET);
             break;
         case SCHALL:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> schall" ANSI_COLOR_RESET);
+            sprintf(str, ANSI_COLOR_GREEN "schall" ANSI_COLOR_RESET);
             break;
         case CHKST:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> chkst" ANSI_COLOR_RESET);
+            sprintf(str, ANSI_COLOR_GREEN "chkst" ANSI_COLOR_RESET);
             break;
         case DOWNL:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> downl\t\t\tcriteria: %d" ANSI_COLOR_RESET, i->inf.hdr.id);
+            sprintf(str, ANSI_COLOR_GREEN "downl\t\t\tcriteria: \"%d\"" ANSI_COLOR_RESET, i->inf.hdr.id);
             break;
         case SEARCH:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> search\t\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "search\t\t\tcriteria: \"%s\"" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
             break;
         case SEARCH_I:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by id\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "search by id\t\tcriteria: \"%d\"" ANSI_COLOR_RESET, i->inf.hdr.id);
             break;
         case SEARCH_A:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by author\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "search by author\t\tcriteria: \"%s\"" ANSI_COLOR_RESET, i->inf.hdr.author);
             break;
         case SEARCH_T:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by trunc_name\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "search by trunc_name\tcriteria: \"%s\"" ANSI_COLOR_RESET, i->inf.hdr.trunc_name);
             break;
         case SEARCH_Y:
-            sprintf(str, ANSI_COLOR_GREEN "instruction -> search by year\t\tcriteria: %s" ANSI_COLOR_RESET, htos(i->inf.hdr, tmp));
+            sprintf(str, ANSI_COLOR_GREEN "search by year\t\tcriteria: \"%d\"" ANSI_COLOR_RESET, i->inf.hdr.year);
             break;
         default:
-            sprintf(str, ANSI_COLOR_RED "instruction -> invalid instruction" ANSI_COLOR_RESET);
+            sprintf(str, ANSI_COLOR_RED "invalid instruction" ANSI_COLOR_RESET);
             break;
     }
-    printf("%s\n", str);
+    printf("instruction -> %s\n", str);
 }
 
 void fetch_args(const char *str, Instruction *i)
 {
     char a[16];
     int fetchedargs;
+    a[0] = 0;
+    i->inf.hdr = init_criteria(&i->inf.hdr);
     switch (i->instr) {
         case LOGIN:
             sscanf(str, "login %s %s", i->inf.usr.id, i->inf.usr.pass);
@@ -112,6 +123,8 @@ void fetch_args(const char *str, Instruction *i)
         case SEARCH_Y:
             sscanf(str, "search y:%d", &i->inf.hdr.year);
             break;
+        case SCHALL:
+            init_criteria(&i->inf.hdr);
         default:
             break;
     }
@@ -121,11 +134,9 @@ instr_t parse_instr(const char *str, Instruction *i)
 {
     regex_t regex;
     int reti = 1;
-    char msgbuf[200];
     instr_t which = LOGIN;
-
     while (which < NO_INSTR) {
-        reti = regcomp(&regex, instr_regex[which], REG_EXTENDED);
+        reti = regcomp(&regex, instr_regex[which], REG_EXTENDED|REG_ICASE);
         if (reti != 0) {
             puts("could not compile regex.");
             which = NO_INSTR;

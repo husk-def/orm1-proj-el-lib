@@ -14,9 +14,8 @@ void download_server(const Header *a, char *output, char *output_name, const cha
     } else {
         /* sizeof output is equal to sizeof file, no need to control */
         while(1) {
-            output[c] = fgetc(fp);
-            //strcat(output, &c);
             if(feof(fp)) break;
+            output[c] = fgetc(fp);
             ++c;
         }
         fclose(fp);

@@ -16,7 +16,7 @@ typedef struct {
 /* init criteria function
  * this function returns a struct with no set criteria
  */
-Header init_criteria();
+Header init_criteria(Header *h);
 
 /* header to string function
  * parses header h into string pointed by *str

@@ -39,10 +39,10 @@ int fill_struct(Header* niz_knjiga, int size)
             --i;
         } else {
             strncpy(niz_knjiga[i].name, de->d_name, 50);
-            printf("-----\nwf: %s|-----\n", niz_knjiga[i].name);
+            //printf("-----\nwf: %s|-----\n", niz_knjiga[i].name);
             strncat(path, niz_knjiga[i].name, 50);
             //sprintf(path, "biblioteka/%s", niz_knjiga[i].name);
-            printf("-----\nwd: %s|\n-----\n", path);
+            //printf("-----\nwd: %s|\n-----\n", path);
             fp = fopen(path, "r");
             //fp = fopen(niz_knjiga[i].name, "r");
             /* reset path */

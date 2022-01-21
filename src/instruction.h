@@ -32,6 +32,8 @@ typedef struct {
     union Info inf;
 } Instruction;
 
+void init_instruction(Instruction *i);
+
 void print_instr(const Instruction *i);
 
 /* fetch arguments function

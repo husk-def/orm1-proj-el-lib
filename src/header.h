@@ -38,4 +38,9 @@ void printh(const Header *h);
  */
 void printh_arr(const Header *harr, int size);
 
+/* sprint header array into str 
+ * str[0] must be 0!!!
+ */
+void sprinth(const Header *h, int size, char *str);
+
 #endif

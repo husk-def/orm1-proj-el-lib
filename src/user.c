@@ -32,7 +32,7 @@ int user_match(const User *u1, const User *u2)
 
 char *utos(const User *usr, char *str)
 {
-    sprintf(str, "%s|%s|", usr->id, usr->pass);
+    sprintf(str, "user: \"%s\", password: \"%s\"\n", usr->id, usr->pass);
     return str;
 }
 

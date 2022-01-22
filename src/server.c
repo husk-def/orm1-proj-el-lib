@@ -4,6 +4,7 @@
 #include "instruction.h"
 #include "search.h"
 #include "user.h"
+#include <stdlib.h>
 
 static inline int is_init(const User *u)
 {
@@ -28,17 +29,31 @@ int main()
     
 
     /* user variables, put them in a function (thread) */
+    /* идеја: клијент шаље стринг (инструкцију) и очекује:
+     *  - instr_t вредност праћену бројем блокова (блок нам је 1024 бајтова);
+     *  - број блокова је пропорционалан величини поруке коју шаљемо са сервера;
+     * овај стринг се шаље у формату "%d %d", (int)type, n_blocks;
+     * потом сервер шаље ехо у смислу:
+     *  - да ли је исправна инструкција (1 блок);
+     *  - одзив инструкције (successful login as.../book to download...) (1 блок);
+     * серверски ехо се подразумева, број блокова који се прослеђује
+     * служи за петљу приликом download-а.
+     * сервер након еха шаље наредне поруке, уколико има потребе (download).
+     */
     User this_user;
     int n_fetched = 0;
+    int n_blocks = 0;
     int user_place;
     int code;
     Header criteria;
     Header fetched[30];
     char tmp[100];
+    char *message_block;
 
     init_users(active_users, 5);
     init_user(&this_user);
     init_criteria(&criteria);
+    message_block = (char *)calloc(1024, sizeof (char));
 
     /* fill struct */
     arr_size = fill_struct(arr, 30);
@@ -55,8 +70,8 @@ int main()
                 break;
             case LOGIN:
                 if (is_init(&this_user) == 1) {
-                    printf("you are already logged in -> ");
-                    print_user(&this_user);
+                    sprintf(message_block, "you are already logged in -> %s", utos(&this_user, tmp));
+                    //print_user(&this_user);
                 } else {
                     code = login(&current);
                     if (code < 0) {
@@ -64,9 +79,9 @@ int main()
                     } else {
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         if (user_place < 0) {
-                            printf("could not add a user.\n");
+                            sprintf(message_block, "could not add a user.\n");
                         } else {
-                            printf("succesfully added a user -> ");
+                            sprintf(message_block, "succesfully added a user -> ");
                             this_user = current.inf.usr;
                             print_user(&this_user);
                         }
@@ -115,6 +130,10 @@ int main()
             default:
                 break;
         }
+
+        tmp[0] = 0;
+        message_block[0] = 0;
+        n_blocks = 0;
     }
 }
 

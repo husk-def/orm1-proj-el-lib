@@ -16,7 +16,7 @@ Header init_criteria(Header *h)
 char * htos(Header h, char *str)
 {
     char buf[200];
-    sprintf(buf, "%s|%d|%s|%s|%d", h.name, h.id, h.author, h.trunc_name, h.year);
+    sprintf(buf, "%s|%d|%s|%s|%d\n", h.name, h.id, h.author, h.trunc_name, h.year);
     strcpy(str, buf);
     return str;
 }
@@ -45,3 +45,12 @@ void printh_arr(const Header *harr, int size)
         printh(&harr[i]);
     }
 }
+
+void sprinth(const Header *h, int size, char *str)
+{
+    char tmp[100];
+    while (--size > -1) {
+        strcat(str, htos(h[size], tmp));
+    }
+}
+

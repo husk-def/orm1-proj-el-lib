@@ -1,19 +1,21 @@
 note deo
 [
-NOTE: ako se ikada desi da deo sa instruction/login zeza, do unije je, javi mi
-NOTE: kada se stavka obradi, promeni TODO u DONE
+NOTE:   ako se ikada desi da deo sa instruction/login zeza, do unije je, javi mi
+NOTE:   kada se stavka obradi, promeni TODO u DONE
+NOTE:   najbolje bi bilo da user fajlove ne menjas dok se ne cujemo, 
+        ima par stvari koje treba da znas da bi mogao to bez greske da radis
 ]
 
 
 todo deo
 [
-DONE: funkcija za parsiranje i ostale potrepstine prebaciti iz test.c u parse.c
-DONE: proveriti funkcionalnost programa
-DONE: dodati jos fajlova u biblioteku
-DONE: Zavrsiti download_client
-DONE: dodati dinamicku alokaciju output string-a iz download_server
-DONE: napraviti algoritam koji parsira output string po 1024 char. Ovde nije potrebna dinamicka alokacija, ako se desi da je poslednji string manji od 1024, nije bitno, samo upisemo opet u buffer.
-DONE: napraviti algoritam koji sada prima ove stringove jedan po jedan i pakuje u novi string iz kog ce se upisivati u novi fajl sa klijentske strane
-DONE: dodati pri download dodavanje ID knjiga u user fajl (proveriti da li je taj ID unique)
-TODO: napraviti multithread aplikaciju
+DONE:   funkcija za parsiranje i ostale potrepstine prebaciti iz test.c u parse.c
+DONE:   proveriti funkcionalnost programa
+DONE:   dodati jos fajlova u biblioteku
+DONE:   Zavrsiti download_client
+DONE:   dodati dinamicku alokaciju output string-a iz download_server
+DONE:   napraviti algoritam koji parsira output string po 1024 char. Ovde nije potrebna dinamicka alokacija, ako se desi da je poslednji string manji od 1024, nije bitno, samo upisemo opet u buffer.
+DONE:   napraviti algoritam koji sada prima ove stringove jedan po jedan i pakuje u novi string iz kog ce se upisivati u novi fajl sa klijentske strane
+DONE:   dodati pri download dodavanje ID knjiga u user fajl (proveriti da li je taj ID unique)
+TODO:   napraviti multithread aplikaciju
 ]

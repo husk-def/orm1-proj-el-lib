@@ -17,7 +17,6 @@ int main()
 {
     Header arr[30];
     User active_users[5];
-    char input[100];
     Instruction current;
     instr_t type;
     int arr_size;
@@ -49,6 +48,7 @@ int main()
     char mig[20];
     char *book = (char *)NULL;
     char path[65];
+    char input[200];
     struct stat st;
 
     init_users(active_users, 5);
@@ -60,7 +60,7 @@ int main()
     arr_size = fill_struct(arr, 30);
     while (1) {
         printf("your instruction: ");
-        fgets(input, 99, stdin);
+        fgets(input, 199, stdin);
         init_instruction(&current);
         type = parse_instr(input, &current);
         print_instr(&current);

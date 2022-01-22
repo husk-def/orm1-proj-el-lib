@@ -46,7 +46,7 @@ void printh_arr(const Header *harr, int size)
     }
 }
 
-void sprinth(const Header *h, int size, char *str)
+void sprinth_arr(const Header *h, int size, char *str)
 {
     char tmp[100];
     while (--size > -1) {

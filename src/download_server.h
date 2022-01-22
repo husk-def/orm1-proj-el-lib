@@ -11,12 +11,10 @@
 
 /* download a book from server function
  * parameters:
- *  a - pointer to header of a book to be downloaded
  *  output - output string to be sent afterwards
- *  output_name - name of a book
  *  path - path of a certain book
- * 
+ *  size - size of file in bytes
  */
-void download_server(const Header *a, char *output, char *output_name, const char *path);
+void download_server(char *output, const char *path, int size);
 
 #endif

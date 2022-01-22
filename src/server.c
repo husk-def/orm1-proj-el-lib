@@ -1,10 +1,14 @@
 
+#include "colors.h"
+#include "download_server.h"
 #include "header.h"
 #include "includes.h"
 #include "instruction.h"
 #include "search.h"
 #include "user.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 static inline int is_init(const User *u)
 {
@@ -21,7 +25,6 @@ int main()
 {
     Header arr[30];
     User active_users[5];
-    char path[50] = "./biblioteka";
     char input[100];
     Instruction current;
     instr_t type;
@@ -32,7 +35,7 @@ int main()
     /* идеја: клијент шаље стринг (инструкцију) и очекује:
      *  - instr_t вредност праћену бројем блокова (блок нам је 1024 бајтова);
      *  - број блокова је пропорционалан величини поруке коју шаљемо са сервера;
-     * овај стринг се шаље у формату "%d %d", (int)type, n_blocks;
+     * овај стринг се шаље у формату "%d %d", (int)type, n_blocks и зове се mig;
      * потом сервер шаље ехо у смислу:
      *  - да ли је исправна инструкција (1 блок);
      *  - одзив инструкције (successful login as.../book to download...) (1 блок);
@@ -41,14 +44,20 @@ int main()
      * сервер након еха шаље наредне поруке, уколико има потребе (download).
      */
     User this_user;
+    int i;
     int n_fetched = 0;
     int n_blocks = 0;
     int user_place;
     int code;
+    int filesize = 0;
     Header criteria;
     Header fetched[30];
     char tmp[100];
     char *message_block;
+    char mig[20];
+    char *book = (char *)NULL;
+    char path[65];
+    struct stat st;
 
     init_users(active_users, 5);
     init_user(&this_user);
@@ -67,22 +76,25 @@ int main()
         switch (current.instr) 
         {
             case NO_INSTR:
+                sprintf(message_block, ANSI_COLOR_RED"invalid instruction.\n"ANSI_COLOR_RESET);
                 break;
             case LOGIN:
                 if (is_init(&this_user) == 1) {
-                    sprintf(message_block, "you are already logged in -> %s", utos(&this_user, tmp));
+                    sprintf(message_block, ANSI_COLOR_RED "you are already logged in -> %s"ANSI_COLOR_RESET, utos(&this_user, tmp));
                     //print_user(&this_user);
                 } else {
                     code = login(&current);
                     if (code < 0) {
                         /* incorrect password */
+                        sprintf(message_block, ANSI_COLOR_RED"could not add a user: incorrect password.\n"ANSI_COLOR_RESET);
                     } else {
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         if (user_place < 0) {
-                            sprintf(message_block, "could not add a user.\n");
+                            sprintf(message_block, ANSI_COLOR_RED"could not add a user: number of users exceeded.\n"ANSI_COLOR_RESET);
                         } else {
-                            sprintf(message_block, "succesfully added a user -> ");
                             this_user = current.inf.usr;
+                            utos(&this_user, tmp);
+                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, tmp);
                             print_user(&this_user);
                         }
                     }
@@ -90,30 +102,39 @@ int main()
                 break;
             case LOGOUT:
                 if (is_init(&this_user) == 0) {
-                    printf("you must login first.\n");
+                    sprintf(message_block, "you must login first.\n");
+                    type = NO_INSTR;
                 } else {
                     remove_user(active_users, user_place);
                     init_user(&this_user);
-                    printf("removed a user.\n");
+                    sprintf(message_block, ANSI_COLOR_GREEN"removed a user.\n"ANSI_COLOR_RESET);
                 }
                 break;
             case CHKST:
                 if (is_init(&this_user) == 0) {
-                    printf("you must login first.\n");
+                    sprintf(message_block, "you must login first.\n");
                 } else {
                     //TODO: implement this
                 }
                 break;
             case DOWNL:
                 if (is_init(&this_user) == 0) {
-                    printf("you must login first.\n");
+                    sprintf(message_block, "you must login first.\n");
                 } else {
                     n_fetched = search_h(arr, current.inf.hdr, fetched, arr_size);
                     if (n_fetched < 1) {
-                        printf("book with id:%d not found\n", current.inf.hdr.id);
+                        sprintf(message_block, "book with id:%d not found\n", current.inf.hdr.id);
                     } else {
-                        printf("book to be downloaded id: %d -> %s\n", fetched[0].id, htos(fetched[0], tmp));
-                        //TODO:
+                        sprintf(message_block, "book to be downloaded id: %d -> %s\n", fetched[0].id, htos(fetched[0], tmp));
+                        sprintf(path, "./biblioteka/%s", fetched[0].name);
+                        stat(path, &st);
+                        filesize = st.st_size;
+                        n_blocks = ceil(filesize / 1023.);
+                        printf("\nsizeof %s is %d\n", path, filesize);
+                        printf(ANSI_COLOR_MAGENTA"calloc: %d\n"ANSI_COLOR_RESET, filesize);
+                        book = (char *)calloc(filesize, sizeof (char));
+                        download_server(book, path, filesize);
+                        // TODO: add unique_add of id into user file
                     }
                 }
                 break;
@@ -126,14 +147,31 @@ int main()
             case SEARCH_Y:
                 criteria = current.inf.hdr;
                 n_fetched = search_h(arr, criteria, fetched, arr_size);
-                printh_arr(fetched, n_fetched);
+                sprinth_arr(fetched, n_fetched, message_block);
             default:
                 break;
         }
 
+        sprintf(mig, "%d %d", (int)type, n_blocks);
+        /* send mig */
+        puts(mig);
+        /* send echo */
+        puts(message_block);
+        /* send blocks (if download) */
+        for (i = 0; i < n_blocks; ++i) {
+            strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
+            puts(message_block);
+        }
+        mig[0] = 0;
         tmp[0] = 0;
         message_block[0] = 0;
         n_blocks = 0;
+        if (book != NULL) {
+            free(book);
+            book = (char *)NULL;
+        }
+        if (type == LOGOUT) 
+            break;
     }
 }
 

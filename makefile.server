@@ -16,10 +16,10 @@ BDIR=bin
 LIBS=-lm -pthread
 
 
-_OBJ = header.o parse.o search.o server.o download_server.o download_client.o instruction.o user.o login.o
+_OBJ = header.o parse.o search.o server.o download_server.o download_client.o instruction.o user.o
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_DEPS = header.h download_server.h parse.h search.h download_client.h instruction.h user.h login.h colors.h
+_DEPS = header.h download_server.h parse.h search.h download_client.h instruction.h user.h colors.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 # The -c flag says to generate the object file
 # The -o $@ says to put the output of the compilation in the file named on the left side of the :

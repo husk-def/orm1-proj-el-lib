@@ -1,14 +1,6 @@
 
-#include "colors.h"
-#include "download_server.h"
-#include "header.h"
 #include "includes.h"
-#include "instruction.h"
-#include "search.h"
 #include "user.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 
 static inline int is_init(const User *u)
 {
@@ -83,7 +75,7 @@ int main()
                     sprintf(message_block, ANSI_COLOR_RED "you are already logged in -> %s"ANSI_COLOR_RESET, utos(&this_user, tmp));
                     //print_user(&this_user);
                 } else {
-                    code = login(&current);
+                    code = login(&current.inf.usr);
                     if (code < 0) {
                         /* incorrect password */
                         sprintf(message_block, ANSI_COLOR_RED"could not add a user: incorrect password.\n"ANSI_COLOR_RESET);
@@ -114,7 +106,7 @@ int main()
                 if (is_init(&this_user) == 0) {
                     sprintf(message_block, "you must login first.\n");
                 } else {
-                    //TODO: implement this
+                    get_ids(&this_user, message_block);
                 }
                 break;
             case DOWNL:
@@ -134,12 +126,11 @@ int main()
                         printf(ANSI_COLOR_MAGENTA"calloc: %d\n"ANSI_COLOR_RESET, filesize);
                         book = (char *)calloc(filesize, sizeof (char));
                         download_server(book, path, filesize);
-                        // TODO: add unique_add of id into user file
+                        unique_id(&this_user, fetched[0].id);
                     }
                 }
                 break;
-            case SCHALL:    
-            /* FALLTHROUGH */
+            case SCHALL:    //FALLTHROUGH
             case SEARCH: 
             case SEARCH_I:
             case SEARCH_A:

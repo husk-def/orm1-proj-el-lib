@@ -1,5 +1,7 @@
 
 #include "user.h"
+#include "colors.h"
+#include <bits/types/FILE.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -78,4 +80,84 @@ void remove_user(User *us, int code)
 {
     us[code].id[0] = 0;
     us[code].pass[0] = 0;
+}
+
+int login(const User *u)
+{
+    char path[24] = "users/";
+    FILE *fp;
+    char password[16];
+
+    strcat(path, u->id);
+    //printf("path: %s|\nsent password: %s|\n", path, i->inf.usr.pass);
+    /* a file must exist for this to work */
+    fp = fopen(path, "r+");
+    if (fp == NULL) {
+        //printf("user doesnt exist, creating a new one\n");
+        /* create a new file */
+        fp = fopen(path, "w");
+        /* put a password in it */
+        fprintf(fp, "%s\n", u->pass);
+    } else {
+        /* fetch a password */
+        fscanf(fp, "%s", password);
+        //printf("fetched password:%s|\n", password);
+        if (strcmp(u->pass, password) == 0) {
+            //printf("correct password.\n");
+            fclose(fp);
+            return 1;
+        } else {
+            //printf("incorrect password.\n");
+            fclose(fp);
+            return -1;
+        }
+    }
+    fclose(fp);
+    return 0;
+}
+
+void unique_id(const User *u, int id)
+{
+    FILE *fp;
+    char path[24];
+    int tmp;
+
+    sprintf(path, "users/%s", u->id);
+    fp = fopen(path, "r+");
+    if (fp == NULL) {
+        printf(ANSI_COLOR_RED"Unexpected error.\n"ANSI_COLOR_RESET);
+        return;
+    } else {
+        fscanf(fp, "%*s\n");
+        while (feof(fp) == 0) {
+            fscanf(fp, "%d ", &tmp);
+            if (tmp == id) {
+                fclose(fp);
+                return;
+            }
+        }
+    }
+    fp = fopen(path, "a");
+    fprintf(fp, "%d ", id);
+    fclose(fp);
+}
+
+void get_ids(const User *u, char *str)
+{
+    FILE *fp;
+    char path[24];   
+    sprintf(path, "users/%s", u->id);
+    fp = fopen(path, "r");
+    if (fp == NULL) {
+        printf(ANSI_COLOR_RED"Unexpected error.\n"ANSI_COLOR_RESET);
+        return;
+    } else {
+        /* skip a password, path is not used anymore */
+        fgets(path, 23, fp);
+        if (feof(fp) == 0) {
+            /* read a line with ids */
+            fgets(str, 1023, fp);
+        }
+    }
+    fclose(fp);
 }

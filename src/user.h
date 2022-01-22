@@ -36,5 +36,13 @@ int add_user(User *us, const User *u, int size);
 
 void remove_user(User *us, int code);
 
+int login(const User *u);
+
+/*
+ * binds an id to user, if its not already binded
+ */
+void unique_id(const User *u, int id);
+
+void get_ids(const User *u, char *str);
 
 #endif //USER_H

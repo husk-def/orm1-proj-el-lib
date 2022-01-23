@@ -33,16 +33,16 @@ Napomene:
  
 Sintaksa instrukcija:
 
- • login id password 
+ • login [USERNAME] [PASSWORD] 
 
  • logout
 
  • schall
 
- • search i:ID a:AUTHOR t:truncated_name y:YEAR
+ • search [i:ID] [a:AUTHOR] [t:TRUNCATED_NAME] [y:YEAR]
 
  • chkst
 
- • downl id
+ • downl [ID]
 
 

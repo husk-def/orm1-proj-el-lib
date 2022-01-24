@@ -58,9 +58,9 @@ int main()
 
     while (1) {
         //printf("%s", user);
-        read_size = recv(sock, message_block, 19, 0);
-        message_block[read_size] = 0;
-        printf("%s %s", user, message_block);
+        //read_size = recv(sock, message_block, 19, 0);
+        //message_block[read_size] = 0;
+        printf("%s ", user);
         fgets(out, 199, stdin);
         if (out[0] == 'n') break;
 

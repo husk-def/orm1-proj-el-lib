@@ -165,7 +165,7 @@ void * thread_server(void *arg)
                         //TODO: add mutex
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         if (user_place < 0) {
-                            sprintf(message_block, "could not add a user: number of users exceeded.\n");
+                            sprintf(message_block, "could not add a user: number of users exceeded or already logged in.\n");
                             type = NO_INSTR;
                         } else {
                             this_user = current.inf.usr;

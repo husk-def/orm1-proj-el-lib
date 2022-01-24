@@ -88,16 +88,19 @@ int main()
             fp = fopen(path, "w");
             if (fp == NULL) {
                 printf("fopen fault\n");
-            } else {
-
-                while (n_blocks-- > 0) {
-                    read_size = recv(sock, message_block, 1024, 0);
-                    message_block[read_size] = 0;
+            } 
+            while (n_blocks-- > 0) {
+                read_size = recv(sock, message_block, 1024, 0);
+                message_block[read_size] = 0;
+                if (fp != NULL) {
                     fwrite(message_block, sizeof (char), strlen(message_block), fp);
-                    message_block[0] = 0;
                 }
+                message_block[0] = 0;
+            }
+            if (fp != NULL) {
                 fclose(fp);
             }
+            
         }
 
     }

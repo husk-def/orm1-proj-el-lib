@@ -94,6 +94,8 @@ int main()
                 message_block[read_size] = 0;
                 if (fp != NULL) {
                     fwrite(message_block, sizeof (char), strlen(message_block), fp);
+                } else {
+                    printf("%s", message_block);
                 }
                 message_block[0] = 0;
             }

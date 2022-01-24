@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 
 #define DEFAULT_PORT 27015
-#define N_USERS 1
+#define N_USERS 2
 
 Header arr[30];
 int arr_size;

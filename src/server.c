@@ -128,7 +128,8 @@ void * thread_server(void *arg)
         send(client_sock, "your instruction: ", strlen("your instruction: "), 0);
 
         //fgets(input, 199, stdin);
-        read_size = recv(client_sock, input, 199, 0);
+        read_size = recv(client_sock, input, 200, 0);
+        input[read_size] = 0;
         puts(input);
 
         if (read_size == 0) {

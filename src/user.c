@@ -159,7 +159,7 @@ void get_ids(const User *u, char *str)
             fgets(str, 1023, fp);
         } else {
             //sprintf(str, "0 books downloaded.");
-            strcat(str, "0 books downloaded.");
+            strcpy(str, "0 books downloaded.");
         }
     }
     fclose(fp);

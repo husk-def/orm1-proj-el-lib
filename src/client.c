@@ -104,7 +104,9 @@ int main()
             }
         } else if (current_instr == NO_INSTR) {
             printf(ANSI_COLOR_RED"%s\n"ANSI_COLOR_RESET, message_block);
+            continue;
         }
+        printf(ANSI_COLOR_GREEN"%s\n"ANSI_COLOR_RESET, message_block);
 
     }
     close(sock);

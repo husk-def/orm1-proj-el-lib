@@ -27,10 +27,11 @@ typedef enum
 int main()
 {
     int sock;
-    int len;
-    int read_size;
+    //int len;
+    //int read_size;
     int n_blocks;
-    instr_t current_instr;
+    //instr_t current_instr;
+    int current_instr;
     struct sockaddr_in server;
     char message_block[1024];
     char out[200];

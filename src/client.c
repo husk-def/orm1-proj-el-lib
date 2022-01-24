@@ -67,11 +67,11 @@ int main()
         send(sock, out, strlen(out), 0);
         /* receive first echo - mig */
         recv(sock, message_block, 10, 0);
-        puts(message_block);
+        printf("%s\n", message_block);
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
         /* receive second echo - instruction response */
         recv(sock, message_block, 1023, 0);
-        puts(message_block);
+        printf("%s\n", message_block);
         if (current_instr == LOGIN) {
             sscanf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, user);
             strcat(user, "> ");

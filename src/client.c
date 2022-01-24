@@ -36,7 +36,7 @@ int main()
     char out[200];
     char user[25] = "> ";
     char bookname[50];
-    char path[70];
+    char path[72];
     FILE *fp;
 
     sock = socket(AF_INET, SOCK_STREAM, 0);

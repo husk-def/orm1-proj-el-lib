@@ -57,9 +57,9 @@ int main()
     puts("Connected\n");
 
     while (1) {
-        printf("%s", user);
+        //printf("%s", user);
         recv(sock, message_block, 1023, 0);
-        printf("%s", message_block);
+        printf("%s %s", user, message_block);
         fgets(out, 199, stdin);
         if (out[0] == 'n') break;
 
@@ -67,11 +67,11 @@ int main()
         send(sock, out, strlen(out), 0);
         /* receive first echo - mig */
         recv(sock, message_block, 10, 0);
-        printf("%s\n", message_block);
+        printf("\n%s\n", message_block);
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
         /* receive second echo - instruction response */
         recv(sock, message_block, 1023, 0);
-        printf("%s\n", message_block);
+        printf("\n%s\n", message_block);
         if (current_instr == LOGIN) {
             sscanf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, user);
             strcat(user, "> ");

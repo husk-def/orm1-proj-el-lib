@@ -125,7 +125,7 @@ void * thread_server(void *arg)
     
     while (1) {
         //printf("your instruction: ");
-        if (send(client_sock, "your instuction: ", strlen("your instruction: "), 0) < 0) {
+        if (send(client_sock, "your instruction: ", strlen("your instruction: "), 0) < 0) {
             puts("send failed");
             return (void *)1;
         }
@@ -171,7 +171,7 @@ void * thread_server(void *arg)
                         } else {
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
-                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, this_user.id);
+                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s\n"ANSI_COLOR_RESET, this_user.id);
                             print_user(&this_user);
                         }
                     }

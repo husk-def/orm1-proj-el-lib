@@ -153,7 +153,7 @@ void get_ids(const User *u, char *str)
         return;
     } else {
         /* skip a password, path is not used anymore */
-        fgets(path, 23, fp);
+        fgets(str, 1023, fp);
         if (feof(fp) == 0) {
             /* read a line with ids */
             fgets(str, 1023, fp);

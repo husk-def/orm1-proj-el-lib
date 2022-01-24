@@ -28,7 +28,7 @@ int main()
 {
     int sock;
     //int len;
-    //int read_size;
+    int read_size;
     int n_blocks;
     //instr_t current_instr;
     int current_instr;
@@ -58,7 +58,8 @@ int main()
 
     while (1) {
         //printf("%s", user);
-        recv(sock, message_block, 19, 0);
+        read_size = recv(sock, message_block, 19, 0);
+        message_block[read_size] = 0;
         printf("%s %s", user, message_block);
         fgets(out, 199, stdin);
         if (out[0] == 'n') break;
@@ -66,11 +67,13 @@ int main()
         /* send an instruction */
         send(sock, out, strlen(out), 0);
         /* receive first echo - mig */
-        recv(sock, message_block, 20, 0);
+        read_size = recv(sock, message_block, 20, 0);
+        message_block[read_size] = 0;
         printf("\n%s\n", message_block);
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
         /* receive second echo - instruction response */
-        recv(sock, message_block, 1023, 0);
+        read_size = recv(sock, message_block, 1023, 0);
+        message_block[read_size] = 0;
         printf("\n%s\n", message_block);
         if (current_instr == LOGIN) {
             sscanf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, user);
@@ -85,6 +88,7 @@ int main()
 
             while (n_blocks-- > 0) {
                 recv(sock, message_block, 1024, 0);
+                message_block[read_size] = 0;
                 fwrite(message_block, sizeof (char), strlen(message_block), fp);
             }
             fclose(fp);

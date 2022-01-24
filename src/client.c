@@ -84,7 +84,7 @@ int main()
         } else if (current_instr == DOWNL && n_blocks > 0) {
             sscanf(message_block, "book to be downloaded id: %*d -> %[^\n]s\n", bookname);
             sprintf(path, "biblioteka_clientside/%s", bookname);
-            printf("\n%s|\n", path);
+            //printf("\n%s|\n", path);
             fp = fopen(path, "w");
             if (fp == NULL) {
                 printf("fopen fault\n");

@@ -4,6 +4,7 @@
 #include <string.h>     //strlen
 #include <sys/socket.h> //socket
 #include <arpa/inet.h>  //inet_addr
+#include <unistd.h>
 #include "colors.h"
 
 #define DEFAULT_PORT 27015
@@ -58,6 +59,8 @@ int main()
         printf("%s", user);
         recv(sock, message_block, 1023, 0);
         fgets(out, 199, stdin);
+        if (out[0] == 'n') break;
+
         /* send an instruction */
         send(sock, out, strlen(out), 0);
         /* receive first echo - mig */
@@ -77,7 +80,7 @@ int main()
             sprintf(path, "biblioteka_clientside/%s", bookname);
             
             fp = fopen(path, "w");
-            
+
             while (n_blocks-- > 0) {
                 recv(sock, message_block, 1024, 0);
                 fwrite(message_block, sizeof (char), strlen(message_block), fp);
@@ -86,7 +89,6 @@ int main()
         }
 
     }
-
-
-
+    close(sock);
+    puts("socket closed.");
 }

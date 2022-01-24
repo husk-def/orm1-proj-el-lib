@@ -170,7 +170,7 @@ void * thread_server(void *arg)
                         } else {
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
-                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s\n"ANSI_COLOR_RESET, this_user.id);
+                            sprintf(message_block, ANSI_COLOR_GREEN"successful login: user -> %s\n"ANSI_COLOR_RESET, this_user.id);
                             print_user(&this_user);
                         }
                     }
@@ -184,7 +184,7 @@ void * thread_server(void *arg)
                     //TODO: add mutex
                     remove_user(active_users, user_place);
                     init_user(&this_user);
-                    sprintf(message_block, ANSI_COLOR_GREEN"removed a user.\n"ANSI_COLOR_RESET);
+                    sprintf(message_block, ANSI_COLOR_GREEN"successful logout.\n"ANSI_COLOR_RESET);
                 }
                 break;
             case CHKST:

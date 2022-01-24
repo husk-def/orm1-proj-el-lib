@@ -118,7 +118,7 @@ void * thread_server(void *arg)
     init_users(active_users, 5);
     init_user(&this_user);
     init_criteria(&criteria);
-    message_block = (char *)calloc(1024, sizeof (char));
+    message_block = (char *)calloc(1025, sizeof (char));
     client_sock = *((int *)arg);
 
     /* fill struct */
@@ -239,6 +239,7 @@ void * thread_server(void *arg)
         /* send blocks (if download) */
         for (i = 0; i < n_blocks; ++i) {
             strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
+            message_block[1024] = 0;
             //puts(message_block);
             send(client_sock, message_block, strlen(message_block), 0);
         }

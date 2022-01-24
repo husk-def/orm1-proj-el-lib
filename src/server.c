@@ -147,11 +147,11 @@ void * thread_server(void *arg)
         switch (current.instr) 
         {
             case NO_INSTR:
-                sprintf(message_block, ANSI_COLOR_RED"invalid instruction.\n"ANSI_COLOR_RESET);
+                sprintf(message_block, "invalid instruction.\n");
                 break;
             case LOGIN:
                 if (is_init(&this_user) == 1) {
-                    sprintf(message_block, ANSI_COLOR_RED "you are already logged in -> %s"ANSI_COLOR_RESET, utos(&this_user, tmp));
+                    sprintf(message_block, "you are already logged in -> %s", utos(&this_user, tmp));
                     //print_user(&this_user);
                     type = NO_INSTR;
                 } else {
@@ -159,18 +159,18 @@ void * thread_server(void *arg)
                     code = login(&current.inf.usr);
                     if (code < 0) {
                         /* incorrect password */
-                        sprintf(message_block, ANSI_COLOR_RED"could not add a user: incorrect password.\n"ANSI_COLOR_RESET);
+                        sprintf(message_block, "could not add a user: incorrect password.\n");
                         type = NO_INSTR;
                     } else {
                         //TODO: add mutex
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         if (user_place < 0) {
-                            sprintf(message_block, ANSI_COLOR_RED"could not add a user: number of users exceeded.\n"ANSI_COLOR_RESET);
+                            sprintf(message_block, "could not add a user: number of users exceeded.\n");
                             type = NO_INSTR;
                         } else {
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
-                            sprintf(message_block, ANSI_COLOR_GREEN"successful login: user -> %s\n"ANSI_COLOR_RESET, this_user.id);
+                            sprintf(message_block, "successful login: user -> %s\n", this_user.id);
                             print_user(&this_user);
                         }
                     }
@@ -184,7 +184,7 @@ void * thread_server(void *arg)
                     //TODO: add mutex
                     remove_user(active_users, user_place);
                     init_user(&this_user);
-                    sprintf(message_block, ANSI_COLOR_GREEN"successful logout.\n"ANSI_COLOR_RESET);
+                    sprintf(message_block, "successful logout.\n");
                 }
                 break;
             case CHKST:

@@ -75,9 +75,9 @@ int main()
         /* receive second echo - instruction response */
         read_size = recv(sock, message_block, 1024, 0);
         message_block[read_size] = 0;
-        printf("\nsrv>\n%s\n\n", message_block);
+        printf("\nsrv>\n");
         if (current_instr == LOGIN) {
-            sscanf(message_block, ANSI_COLOR_GREEN"successful login: user -> %s\n"ANSI_COLOR_RESET, user);
+            sscanf(message_block, "successful login: user -> %s\n", user);
             strcat(user, "> ");
         } else if (current_instr == LOGOUT) {
             sprintf(user, "> ");
@@ -102,7 +102,8 @@ int main()
             if (fp != NULL) {
                 fclose(fp);
             }
-            
+        } else if (current_instr == NO_INSTR) {
+            printf(ANSI_COLOR_RED"%s\n"ANSI_COLOR_RESET, message_block);
         }
 
     }

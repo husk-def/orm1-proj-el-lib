@@ -158,7 +158,8 @@ void get_ids(const User *u, char *str)
             /* read a line with ids */
             fgets(str, 1023, fp);
         } else {
-            sprintf(str, "0 books downloaded.");
+            //sprintf(str, "0 books downloaded.");
+            strcat(str, "0 books downloaded.");
         }
     }
     fclose(fp);

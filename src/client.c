@@ -77,7 +77,7 @@ int main()
         message_block[read_size] = 0;
         printf("\n%s\n\n", message_block);
         if (current_instr == LOGIN) {
-            sscanf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, user);
+            sscanf(message_block, ANSI_COLOR_GREEN"successful login: user -> %s\n"ANSI_COLOR_RESET, user);
             strcat(user, "> ");
         } else if (current_instr == LOGOUT) {
             sprintf(user, "> ");

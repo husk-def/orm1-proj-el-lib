@@ -86,9 +86,12 @@ int main()
             sprintf(path, "biblioteka_clientside/%s", bookname);
             printf("\n%s|\n", path);
             fp = fopen(path, "w");
+            if (fp == NULL) {
+                printf("fopen fault\n");
+            }
 
             while (n_blocks-- > 0) {
-                recv(sock, message_block, 1024, 0);
+                read_size = recv(sock, message_block, 1024, 0);
                 message_block[read_size] = 0;
                 fwrite(message_block, sizeof (char), strlen(message_block), fp);
             }

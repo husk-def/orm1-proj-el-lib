@@ -73,7 +73,7 @@ int main()
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
         printf("\n%d %d\n", current_instr, n_blocks);
         /* receive second echo - instruction response */
-        read_size = recv(sock, message_block, 1023, 0);
+        read_size = recv(sock, message_block, 1024, 0);
         message_block[read_size] = 0;
         printf("\n%s\n\n", message_block);
         if (current_instr == LOGIN) {

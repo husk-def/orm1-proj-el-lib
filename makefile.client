@@ -16,10 +16,10 @@ BDIR=bin
 LIBS=-lm -pthread
 
 
-_OBJ = client.o table.o interface.o score.o getch.o rank.o score.o
+_OBJ = client.o 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
-_DEPS = config.h move.h table.h interface.h score.h getch.h rank.h
+_DEPS = colors.h
 DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS))
 # The -c flag says to generate the object file
 # The -o $@ says to put the output of the compilation in the file named on the left side of the :

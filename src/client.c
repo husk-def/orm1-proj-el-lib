@@ -59,6 +59,7 @@ int main()
     while (1) {
         printf("%s", user);
         recv(sock, message_block, 1023, 0);
+        printf("%s", message_block);
         fgets(out, 199, stdin);
         if (out[0] == 'n') break;
 

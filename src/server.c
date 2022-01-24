@@ -1,6 +1,20 @@
 
 #include "includes.h"
+#include "instruction.h"
 #include "user.h"
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <string.h>
+#include <sys/socket.h>
+
+#define DEFAULT_PORT 27015
+#define N_USERS 1
+
+Header arr[30];
+int arr_size;
+User active_users[N_USERS];
+
+void * thread_server(void *arg);
 
 static inline int is_init(const User *u)
 {
@@ -15,13 +29,59 @@ static inline int is_init(const User *u)
 
 int main()
 {
-    Header arr[30];
-    User active_users[5];
-    Instruction current;
-    instr_t type;
-    int arr_size;
-    
+    int socket_desc;
+    int c;
+    int *cl[N_USERS];
+    int i;
+    int client_sock[N_USERS];
+    struct sockaddr_in server;
+    struct sockaddr_in client[N_USERS];
+    pthread_t client_th[N_USERS];
 
+    arr_size = fill_struct(arr, 30);
+
+    socket_desc = socket(AF_INET , SOCK_STREAM , 0);
+    if (socket_desc == -1)
+    {
+        printf("Could not create socket");
+	    return 1;
+    }
+    puts("Socket created");
+
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons(DEFAULT_PORT);
+    
+    if (bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
+    {
+        perror("bind failed. Error");
+        return 1;
+    }
+    puts("bind done");
+    listen(socket_desc , N_USERS);
+    puts("Waiting for incoming connections...");
+    c = sizeof(struct sockaddr_in);
+
+    for (i = 0; i < N_USERS; ++i) {
+        client_sock[i] = accept(socket_desc, (struct sockaddr *)&client[i], (socklen_t *)&c);
+        if (client_sock[i] < 0) {
+            printf("accept failed: sock %d\n", i);
+            return 1;
+        }
+        printf("connection accepted: sock %d - %s\n", i, inet_ntoa(client[i].sin_addr));
+
+        pthread_create(&client_th[i], NULL, thread_server, &client_sock[i]);
+    }
+
+    for (i = 0; i < N_USERS; ++i) {
+        pthread_join(client_th[i], NULL);
+    }
+
+    return 0;
+}
+
+void * thread_server(void *arg)
+{
     /* user variables, put them in a function (thread) */
     /* идеја: клијент шаље стринг (инструкцију) и очекује:
      *  - instr_t вредност праћену бројем блокова (блок нам је 1024 бајтова);
@@ -35,12 +95,14 @@ int main()
      * сервер након еха шаље наредне поруке, уколико има потребе (download).
      */
     User this_user;
+    int client_sock;
     int i;
     int n_fetched = 0;
     int n_blocks = 0;
     int user_place;
     int code;
     int filesize = 0;
+    int read_size;
     Header criteria;
     Header fetched[30];
     char tmp[100];
@@ -50,17 +112,35 @@ int main()
     char path[65];
     char input[200];
     struct stat st;
+    Instruction current;
+    instr_t type;
 
     init_users(active_users, 5);
     init_user(&this_user);
     init_criteria(&criteria);
     message_block = (char *)calloc(1024, sizeof (char));
+    client_sock = *((int *)arg);
 
     /* fill struct */
-    arr_size = fill_struct(arr, 30);
+    
     while (1) {
-        printf("your instruction: ");
-        fgets(input, 199, stdin);
+        //printf("your instruction: ");
+        if (send(client_sock, "your instuction: ", strlen("your instruction: "), 0) < 0) {
+            puts("send failed");
+            return (void *)1;
+        }
+        //fgets(input, 199, stdin);
+        read_size = recv(client_sock, input, 199, 0);
+        puts(input);
+
+        if (read_size == 0) {
+            puts("client disconnected");
+            return (void *)0;
+        } else if (read_size == -1) {
+            puts("recv failed");
+            continue;
+        }
+
         init_instruction(&current);
         type = parse_instr(input, &current);
         print_instr(&current);
@@ -74,19 +154,24 @@ int main()
                 if (is_init(&this_user) == 1) {
                     sprintf(message_block, ANSI_COLOR_RED "you are already logged in -> %s"ANSI_COLOR_RESET, utos(&this_user, tmp));
                     //print_user(&this_user);
+                    type = NO_INSTR;
                 } else {
+                    //TODO: add mutex
                     code = login(&current.inf.usr);
                     if (code < 0) {
                         /* incorrect password */
                         sprintf(message_block, ANSI_COLOR_RED"could not add a user: incorrect password.\n"ANSI_COLOR_RESET);
+                        type = NO_INSTR;
                     } else {
+                        //TODO: add mutex
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         if (user_place < 0) {
                             sprintf(message_block, ANSI_COLOR_RED"could not add a user: number of users exceeded.\n"ANSI_COLOR_RESET);
+                            type = NO_INSTR;
                         } else {
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
-                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, tmp);
+                            sprintf(message_block, ANSI_COLOR_GREEN"succesfully added a user -> %s"ANSI_COLOR_RESET, this_user.id);
                             print_user(&this_user);
                         }
                     }
@@ -97,6 +182,7 @@ int main()
                     sprintf(message_block, "you must login first.\n");
                     type = NO_INSTR;
                 } else {
+                    //TODO: add mutex
                     remove_user(active_users, user_place);
                     init_user(&this_user);
                     sprintf(message_block, ANSI_COLOR_GREEN"removed a user.\n"ANSI_COLOR_RESET);
@@ -117,7 +203,7 @@ int main()
                     if (n_fetched < 1) {
                         sprintf(message_block, "book with id:%d not found\n", current.inf.hdr.id);
                     } else {
-                        sprintf(message_block, "book to be downloaded id: %d -> %s\n", fetched[0].id, htos(fetched[0], tmp));
+                        sprintf(message_block, "book to be downloaded id: %d -> %s\n", fetched[0].id, fetched[0].name);
                         sprintf(path, "./biblioteka/%s", fetched[0].name);
                         stat(path, &st);
                         filesize = st.st_size;
@@ -126,6 +212,7 @@ int main()
                         printf(ANSI_COLOR_MAGENTA"calloc: %d\n"ANSI_COLOR_RESET, filesize);
                         book = (char *)calloc(filesize, sizeof (char));
                         download_server(book, path, filesize);
+                        //TODO: add mutex
                         unique_id(&this_user, fetched[0].id);
                     }
                 }
@@ -145,13 +232,16 @@ int main()
 
         sprintf(mig, "%d %d", (int)type, n_blocks);
         /* send mig */
-        puts(mig);
+        //puts(mig);
+        send(client_sock, mig, strlen(mig), 0);
         /* send echo */
-        puts(message_block);
+        //puts(message_block);
+        send(client_sock, message_block, strlen(message_block), 0);
         /* send blocks (if download) */
         for (i = 0; i < n_blocks; ++i) {
             strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
-            puts(message_block);
+            //puts(message_block);
+            send(client_sock, message_block, strlen(message_block), 0);
         }
         mig[0] = 0;
         tmp[0] = 0;
@@ -161,216 +251,6 @@ int main()
             free(book);
             book = (char *)NULL;
         }
-        if (type == LOGOUT) 
-            break;
     }
 }
 
-// int main()
-// {
-//     int size;
-//     int n_matched = 0;
-//     Header arr[30];
-//     Header tmp[30];
-//     Header criteria;
-//     char output[100];
-//     char path[50] = "./biblioteka/";
-//     struct stat st;
-//     int filesize;
-
-//     printf("***********fill_struct************\n\n");
-//     size = fill_struct(arr, 30);
-//     printf("\nfetched %d files.\n\n***********printh_arr*************\n\n", size);
-//     printh_arr(arr, size);
-//     printf("\n\n");
-// ///////////////////////////////////////////////////////////////////
-//     /* setup criteria */
-//     /* search only by id = 3 */
-//     criteria = init_criteria();
-//     criteria.id = 3;
-
-//     n_matched = search_h(arr, criteria, tmp, size);
-
-//     printf("\n***********criteria***********\n");
-//     printh(&criteria);
-//     printf("\n***********matched************ n_matched = %d\n", n_matched);
-//     printh_arr(tmp, n_matched);
-// ///////////////////////////////////////////////////////////////////
-//     /* setup criteria */
-//     /* search only by author = "Trifunovic Milorad" */
-//     criteria = init_criteria();
-//     strcpy(criteria.author, "Trifunovic Milorad");
-
-//     n_matched = search_h(arr, criteria, tmp, size);
-
-//     printf("\n***********criteria***********\n");
-//     printh(&criteria);
-//     printf("\n***********matched************ n_matched = %d\n", n_matched);
-//     printh_arr(tmp, n_matched);
-// ///////////////////////////////////////////////////////////////////
-//     /* setup criteria */
-//     /* search by 
-//      * author = "Trifunovic Milorad" 
-//      * year = 2022
-//      */
-//     criteria = init_criteria();
-//     strcpy(criteria.author, "Trifunovic Milorad");
-//     criteria.year = 2022;
-
-//     n_matched = search_h(arr, criteria, tmp, size);
-
-//     printf("\n***********criteria***********\n");
-//     printh(&criteria);
-//     printf("\n***********matched************ n_matched = %d\n", n_matched);
-//     printh_arr(tmp, n_matched);
-// ///////////////////////////////////////////////////////////////////
-//     /* setup criteria */
-//     /* search all
-//      *  
-//      * 
-//      */
-//     criteria = init_criteria();
-
-//     n_matched = search_h(arr, criteria, tmp, size);
-
-//     printf("\n***********criteria***********\n");
-//     printh(&criteria);
-//     printf("\n***********matched************ n_matched = %d\n", n_matched);
-//     printh_arr(tmp, n_matched);
-
-// ////////////////////////////////////////////////////////////////////
-//     /*test download*/
-//     printh(arr);
-//     criteria = init_criteria();
-//     criteria.id = 2;
-//     /*test_name kao prva poruka da klijent zna kako da imenuje novi fajl, ostatak sadrzaja je u test_string*/
-//     char *test_string;
-//     char test_name[50]; 
-
-//     n_matched = search_h(arr, criteria, tmp, size);
-//     if (n_matched < 1) {
-//         strcpy(output, "download_server: The book with the given id doesn't exist\n");
-//     } else {
-//         /* fetch only one book */
-//         strcat(path, tmp[0].name);
-//         stat(path, &st);
-//         filesize = st.st_size;
-//         printf("\nsizeof %s is %d\n", path, filesize);
-//     }
-//     test_string = (char *)calloc(filesize, sizeof(char));
-//     if (test_string == NULL) {
-//         printf("calloc unsuccessful\n");
-//     }
-
-//     download_server(&tmp[0], test_string, test_name, path);
-    
-//     printf("***************************************\n\nfilename:%s\ncontent->\n%s\n****************************",test_name, test_string);
-
-//     ////////////////////algoritam za podelu i slanje poruke/////////////////////
-    
-//     int k = 0;
-//     char recvString[200];
-//     char sendBuffer[TCP_SUBSTRING_LEN];
-//     int num_of_sends = ceil(filesize / (float)(TCP_SUBSTRING_LEN - 1));
-//     printf("\nnumber of substrings = %d\n\n", num_of_sends);
-
-//     //strcat(test_string, "&"); //char koji oznacava kraj falja
-//     memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
-//     for (int i = 0; i < num_of_sends; i++) {
-//         for (int j = 0; j < TCP_SUBSTRING_LEN - 1; j++) {
-//             if (test_string[k] == 0) {
-//                 sendBuffer[j] = test_string[k];
-//                 break;
-//             }          
-//             sendBuffer[j] = test_string[k];
-//             k++;
-//         }
-//         if (test_string[k] != 0) {
-//             sendBuffer[TCP_SUBSTRING_LEN - 1] = 0;
-//         }
-//         /*umesto strcat() treba da ide sendv()*/
-//         strcat(recvString, sendBuffer);
-//         memset(sendBuffer, 0, TCP_SUBSTRING_LEN * sizeof(char));
-//     }
-//     printf("\n%s\n", recvString);
-    
-//     /* free calloc-ed buffer */
-//     free(test_string);
-
-//     /*!!!! sendv(test_name) <------ potrebno je na pocetku ili kraju poslati i poruku koja sadrzi ime fajla*/
-
-//     //////////////////////test download_client//////////////////////////////
-//     // printf("\n\n***************test download_client**************\n");
-//     // char client_path[50] = "./biblioteka_client/";
-//     // download_client(recvString, test_name, client_path);
-
-// ////////////////////////////////////////////////////////////////////////////////////
-//     Instruction i;
-//     i.inf.hdr = init_criteria();
-//     i.instr = LOGIN;
-//     strcpy(i.inf.usr.id, "baja");
-//     strcpy(i.inf.usr.pass, "bajinasifra");
-//     print_instr(&i);
-
-//     int code;
-//     printf("********************test with existing user, correct password*********************\n");
-//     code = login(&i);
-//     printf("error code: %d\n", code);
-//     printf("********************test with existing user, incorrect password*********************\n");
-//     strcpy(i.inf.usr.pass, "nebajinasifra");
-//     code = login(&i);
-//     printf("error code: %d\n", code);
-//     printf("********************test with non-existing user, should create a new file*********************\n");
-//     strcpy(i.inf.usr.id, "novikorisnik");
-//     code = login(&i);
-//     printf("error code: %d\n", code);
-// ///////////////////////////////////////////////////////////////////////////////////
-//     printf("******************regex instruction check**********************************\n");
-//     /* regex test */
-//     Instruction instrukcija;
-//     instr_t retval;
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search i:24", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search a:mikrolad prezime", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search f:24", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("login baja bajinasifra", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("logout", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("schall", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("chkst", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search i:23 a:mikrolad fifi t:shortbook y:2019", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search y:2023", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("search t:kratkoime", &instrukcija);
-//     print_instr(&instrukcija);
-
-//     instrukcija.inf.hdr = init_criteria();
-//     retval = parse_instr("downl 24", &instrukcija);
-//     print_instr(&instrukcija);
-// }

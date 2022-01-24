@@ -91,9 +91,10 @@ int main()
             }
 
             while (n_blocks-- > 0) {
-                read_size = recv(sock, message_block, 1024, 0);
+                read_size = recv(sock, message_block, 1023, 0);
                 message_block[read_size] = 0;
                 fwrite(message_block, sizeof (char), strlen(message_block), fp);
+                message_block[0] = 0;
             }
             fclose(fp);
         }

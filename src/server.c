@@ -133,7 +133,12 @@ void * thread_server(void *arg)
         puts(input);
 
         if (read_size == 0) {
-            puts("client disconnected");
+            puts("client disconnected, log him out");
+            if (is_init(&this_user) == 1) {
+                //TODO: add mutex
+                remove_user(active_users, user_place);
+                init_user(&this_user);
+            }
             return (void *)0;
         } else if (read_size == -1) {
             puts("recv failed");

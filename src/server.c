@@ -13,6 +13,7 @@
 Header arr[30];
 int arr_size;
 User active_users[N_USERS];
+pthread_mutex_t lock;
 
 void * thread_server(void *arg);
 
@@ -38,6 +39,11 @@ int main()
     struct sockaddr_in client[N_USERS];
     pthread_t client_th[N_USERS];
 
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("Mutex init has failed\n");
+    return -1;
+    }
+
     arr_size = fill_struct(arr, 30);
 
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
@@ -59,7 +65,11 @@ int main()
     }
     puts("bind done");
     listen(socket_desc , N_USERS);
+    /*Loradmi*/
+    printf("Server address: %s\n", inet_ntoa(server.sin_addr));
+    printf("Server listening to port %u\n", ntohs(server.sin_port));
     puts("Waiting for incoming connections...");
+    /********/
     c = sizeof(struct sockaddr_in);
 
     for (i = 0; i < N_USERS; ++i) {
@@ -136,7 +146,9 @@ void * thread_server(void *arg)
             puts("client disconnected, log him out");
             if (is_init(&this_user) == 1) {
                 //TODO: add mutex
+                pthread_mutex_lock(&lock);
                 remove_user(active_users, user_place);
+                pthread_mutex_unlock(&lock);
                 init_user(&this_user);
             }
             return (void *)0;
@@ -161,14 +173,18 @@ void * thread_server(void *arg)
                     type = NO_INSTR;
                 } else {
                     //TODO: add mutex
+                    pthread_mutex_lock(&lock);
                     code = login(&current.inf.usr);
+                    pthread_mutex_unlock(&lock);
                     if (code < 0) {
                         /* incorrect password */
                         sprintf(message_block, "could not add a user: incorrect password.\n");
                         type = NO_INSTR;
                     } else {
                         //TODO: add mutex
+                        pthread_mutex_lock(&lock);
                         user_place = add_user(active_users, &current.inf.usr, 5);
+                        pthread_mutex_unlock(&lock);
                         if (user_place < 0) {
                             sprintf(message_block, "could not add a user: number of users exceeded or already logged in.\n");
                             type = NO_INSTR;
@@ -187,7 +203,9 @@ void * thread_server(void *arg)
                     type = NO_INSTR;
                 } else {
                     //TODO: add mutex
+                    pthread_mutex_lock(&lock);
                     remove_user(active_users, user_place);
+                    pthread_mutex_unlock(&lock);
                     init_user(&this_user);
                     sprintf(message_block, "successful logout.\n");
                 }
@@ -217,7 +235,9 @@ void * thread_server(void *arg)
                         book = (char *)calloc(filesize, sizeof (char));
                         download_server(book, path, filesize);
                         //TODO: add mutex
+                        pthread_mutex_lock(&lock);
                         unique_id(&this_user, fetched[0].id);
+                        pthread_mutex_unlock(&lock);
                     }
                 }
                 break;

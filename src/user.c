@@ -1,7 +1,6 @@
 
 #include "user.h"
 #include "colors.h"
-#include <bits/types/FILE.h>
 #include <string.h>
 #include <stdio.h>
 

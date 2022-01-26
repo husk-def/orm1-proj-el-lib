@@ -4,6 +4,10 @@ NOTE:   ako se ikada desi da deo sa instruction/login zeza, do unije je, javi mi
 NOTE:   kada se stavka obradi, promeni TODO u DONE
 NOTE:   najbolje bi bilo da user fajlove ne menjas dok se ne cujemo, 
         ima par stvari koje treba da znas da bi mogao to bez greske da radis
+NOTE:	pogledaj sa serverske strane sto printuje njegovu adresu, nisam siguran zasto pise 0.0.0.0, kao da
+	INADDR_ANY uvek dodeljuje 0.0.0.0 . Znam da ispis za adresu lepo radi jer sa klijentske strane uredno ispisuje
+	unetu adresu. Inace kada se unese 0.0.0.0 sa klijentske strane klijent se konektuje na srv, isto kad napisem 
+	i 127.0.0.1 
 ]
 
 

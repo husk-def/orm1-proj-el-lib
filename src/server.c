@@ -1,14 +1,33 @@
 
+#include "colors.h"
 #include "includes.h"
 #include "instruction.h"
 #include "user.h"
 #include <arpa/inet.h>
-#include <netinet/in.h>
+//#include <netinet/in.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <ifaddrs.h>
 
 #define DEFAULT_PORT 27015
 #define N_USERS 2
+
+/*
+#include <ifaddrs.h>
+#include <stdio.h>
+int main()
+{
+struct ifaddrs *id;
+int val;
+val = getifaddrs(&id);
+printf("Network Interface Name :- %s\n",id->ifa_name);
+printf("Network Address of %s :- %d\n",id->ifa_name,id->ifa_addr);
+printf("Network Data :- %d \n",id->ifa_data);
+printf("Socket Data : -%c\n",id->ifa_addr->sa_data);
+return 0;
+}
+*/
 
 Header arr[30];
 int arr_size;
@@ -32,12 +51,20 @@ int main()
 {
     int socket_desc;
     int c;
-    int *cl[N_USERS];
     int i;
     int client_sock[N_USERS];
     struct sockaddr_in server;
     struct sockaddr_in client[N_USERS];
     pthread_t client_th[N_USERS];
+    
+    //val = getifaddrs(&id);
+    //printf("Network Interface Name :- %s\n",id->ifa_name);
+    //printf("Network Address of %s :- %s\n",id->ifa_name, id->ifa_addr->sa_data);
+    printf("\n");
+    system("nmcli -p device show | grep \"IP4.ADDR\" | head -1");
+    printf("\n");
+    //printf("Network Data :- %d \n", id->ifa_data);
+    //printf("Socket Data : -%s\n", id->ifa_addr->sa_data);
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
         printf("Mutex init has failed\n");
@@ -47,8 +74,7 @@ int main()
     arr_size = fill_struct(arr, 30);
 
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
-    if (socket_desc == -1)
-    {
+    if (socket_desc == -1) {
         printf("Could not create socket");
 	    return 1;
     }
@@ -58,16 +84,15 @@ int main()
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(DEFAULT_PORT);
     
-    if (bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
-    {
+    if (bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0) {
         perror("bind failed. Error");
         return 1;
     }
     puts("bind done");
     listen(socket_desc , N_USERS);
     /*Loradmi*/
-    printf("Server address: %s\n", inet_ntoa(server.sin_addr));
-    printf("Server listening to port %u\n", ntohs(server.sin_port));
+    //printf("Server address: %s\n", inet_ntoa(server.sin_addr));
+    printf("Server listening on port %u\n", ntohs(server.sin_port));
     puts("Waiting for incoming connections...");
     /********/
     c = sizeof(struct sockaddr_in);
@@ -140,7 +165,8 @@ void * thread_server(void *arg)
         //fgets(input, 199, stdin);
         read_size = recv(client_sock, input, 200, 0);
         input[read_size] = 0;
-        puts(input);
+        //puts(input);
+        printf("%s", input);
 
         if (read_size == 0) {
             puts("client disconnected, log him out");
@@ -192,7 +218,7 @@ void * thread_server(void *arg)
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
                             sprintf(message_block, "successful login: user -> %s\n", this_user.id);
-                            print_user(&this_user);
+                            //print_user(&this_user);
                         }
                     }
                 }
@@ -264,13 +290,17 @@ void * thread_server(void *arg)
         /* send blocks (if download) */
         for (i = 0; i < n_blocks; ++i) {
             strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
-            message_block[1024] = 0;
+            
             //puts(message_block);
             send(client_sock, message_block, strlen(message_block), 0);
+            message_block[1024] = 0;
         }
-        mig[0] = 0;
-        tmp[0] = 0;
-        message_block[0] = 0;
+        //mig[0] = 0;
+        memset(mig, 0, 20 * sizeof (char));
+        //tmp[0] = 0;
+        memset(tmp, 0, 100 * sizeof (char));
+        //message_block[0] = 0;
+        memset(message_block, 0, 1025 * sizeof (char));
         n_blocks = 0;
         if (book != NULL) {
             free(book);

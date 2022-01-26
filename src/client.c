@@ -81,6 +81,7 @@ int main(int argc, char*argv[])
 
         /* send an instruction */
         send(sock, out, strlen(out), 0);
+
         /* receive first echo - mig */
         memset(message_block, 0, 1024 * sizeof (char));
         read_size = recv(sock, message_block, 1023, 0);
@@ -88,11 +89,13 @@ int main(int argc, char*argv[])
         message_block[read_size] = 0;
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
         printf("\n%d %d\n", current_instr, n_blocks);
+
         /* receive second echo - instruction response */
         memset(message_block, 0, 1024 * sizeof (char));
         read_size = recv(sock, message_block, 1023, 0);
         printf("read_size: %d\n", read_size);
         message_block[read_size] = 0;
+        
         printf("srv>\n");
         if (current_instr == LOGIN) {
             sscanf(message_block, "successful login: user -> %s\n", user);
@@ -103,10 +106,12 @@ int main(int argc, char*argv[])
             sscanf(message_block, "book to be downloaded id: %*d -> %[^\n]s\n", bookname);
             sprintf(path, "biblioteka_clientside/%s", bookname);
             printf("%s\n", message_block);
+            puts(path);
             fp = fopen(path, "w");
             if (fp == NULL) {
                 printf("fopen fault\n");
             } 
+            memset(message_block, 0, 1024 * sizeof (char));
             while (n_blocks-- > 0) {
                 read_size = recv(sock, message_block, 1023, 0);
                 printf("read_size: %d\n", read_size);

@@ -23,10 +23,13 @@ void init_users(User *us, int size)
 int user_match(const User *u1, const User *u2)
 {
     if (u1->id[0] == 0 || u2->id[0] == 0 || u1->pass[0] == 0 || u2->pass[0] == 0) {
+        puts("user nomatch 1");
         return 1;
-    } else if ((strcmp(u1->id, u2->id) != 0) || (strcmp(u1->pass, u2->pass) != 0)) {
+    } else if (strcmp(u1->id, u2->id) != 0) {
+        puts("user nomatch 2");
         return 1;
     } else {
+        puts("user match");
         return 0;
     }
 }

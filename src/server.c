@@ -4,7 +4,6 @@
 #include "instruction.h"
 #include "user.h"
 #include <arpa/inet.h>
-//#include <netinet/in.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -12,22 +11,6 @@
 
 #define DEFAULT_PORT 27015
 #define N_USERS 2
-
-/*
-#include <ifaddrs.h>
-#include <stdio.h>
-int main()
-{
-struct ifaddrs *id;
-int val;
-val = getifaddrs(&id);
-printf("Network Interface Name :- %s\n",id->ifa_name);
-printf("Network Address of %s :- %d\n",id->ifa_name,id->ifa_addr);
-printf("Network Data :- %d \n",id->ifa_data);
-printf("Socket Data : -%c\n",id->ifa_addr->sa_data);
-return 0;
-}
-*/
 
 Header arr[30];
 int arr_size;
@@ -56,26 +39,23 @@ int main()
     struct sockaddr_in server;
     struct sockaddr_in client[N_USERS];
     pthread_t client_th[N_USERS];
+
+    init_users(active_users, N_USERS);
     
-    //val = getifaddrs(&id);
-    //printf("Network Interface Name :- %s\n",id->ifa_name);
-    //printf("Network Address of %s :- %s\n",id->ifa_name, id->ifa_addr->sa_data);
     printf("\n");
     system("nmcli -p device show | grep \"IP4.ADDR\" | head -1");
     printf("\n");
-    //printf("Network Data :- %d \n", id->ifa_data);
-    //printf("Socket Data : -%s\n", id->ifa_addr->sa_data);
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
-        printf("Mutex init has failed\n");
-    return -1;
+        perror("Mutex init has failed\n");
+        return -1;
     }
 
     arr_size = fill_struct(arr, 30);
 
     socket_desc = socket(AF_INET , SOCK_STREAM , 0);
     if (socket_desc == -1) {
-        printf("Could not create socket");
+        perror("Could not create socket");
 	    return 1;
     }
     puts("Socket created");
@@ -90,11 +70,8 @@ int main()
     }
     puts("bind done");
     listen(socket_desc , N_USERS);
-    /*Loradmi*/
-    //printf("Server address: %s\n", inet_ntoa(server.sin_addr));
     printf("Server listening on port %u\n", ntohs(server.sin_port));
     puts("Waiting for incoming connections...");
-    /********/
     c = sizeof(struct sockaddr_in);
 
     for (i = 0; i < N_USERS; ++i) {
@@ -149,29 +126,19 @@ void * thread_server(void *arg)
     struct stat st;
     Instruction current;
     instr_t type;
-
-    init_users(active_users, 5);
+   
     init_user(&this_user);
     init_criteria(&criteria);
     message_block = (char *)calloc(1025, sizeof (char));
     client_sock = *((int *)arg);
-
-    /* fill struct */
     
     while (1) {
-        //printf("your instruction: ");
-        //send(client_sock, "your instruction: ", strlen("your instruction: "), 0);
-
-        //fgets(input, 199, stdin);
         read_size = recv(client_sock, input, 200, 0);
         input[read_size] = 0;
-        //puts(input);
         printf("%s", input);
-
         if (read_size == 0) {
             puts("client disconnected, log him out");
             if (is_init(&this_user) == 1) {
-                //TODO: add mutex
                 pthread_mutex_lock(&lock);
                 remove_user(active_users, user_place);
                 pthread_mutex_unlock(&lock);
@@ -182,11 +149,9 @@ void * thread_server(void *arg)
             puts("recv failed");
             continue;
         }
-
         init_instruction(&current);
         type = parse_instr(input, &current);
         print_instr(&current);
-
         switch (current.instr) 
         {
             case NO_INSTR:
@@ -195,10 +160,8 @@ void * thread_server(void *arg)
             case LOGIN:
                 if (is_init(&this_user) == 1) {
                     sprintf(message_block, "you are already logged in -> %s", utos(&this_user, tmp));
-                    //print_user(&this_user);
                     type = NO_INSTR;
                 } else {
-                    //TODO: add mutex
                     pthread_mutex_lock(&lock);
                     code = login(&current.inf.usr);
                     pthread_mutex_unlock(&lock);
@@ -207,7 +170,6 @@ void * thread_server(void *arg)
                         sprintf(message_block, "could not add a user: incorrect password.\n");
                         type = NO_INSTR;
                     } else {
-                        //TODO: add mutex
                         pthread_mutex_lock(&lock);
                         user_place = add_user(active_users, &current.inf.usr, 5);
                         pthread_mutex_unlock(&lock);
@@ -218,7 +180,6 @@ void * thread_server(void *arg)
                             this_user = current.inf.usr;
                             utos(&this_user, tmp);
                             sprintf(message_block, "successful login: user -> %s\n", this_user.id);
-                            //print_user(&this_user);
                         }
                     }
                 }
@@ -228,7 +189,6 @@ void * thread_server(void *arg)
                     sprintf(message_block, "you must login first.\n");
                     type = NO_INSTR;
                 } else {
-                    //TODO: add mutex
                     pthread_mutex_lock(&lock);
                     remove_user(active_users, user_place);
                     pthread_mutex_unlock(&lock);
@@ -260,7 +220,7 @@ void * thread_server(void *arg)
                         printf(ANSI_COLOR_MAGENTA"calloc: %d\n"ANSI_COLOR_RESET, filesize);
                         book = (char *)calloc(filesize, sizeof (char));
                         download_server(book, path, filesize);
-                        //TODO: add mutex
+                        
                         pthread_mutex_lock(&lock);
                         unique_id(&this_user, fetched[0].id);
                         pthread_mutex_unlock(&lock);
@@ -275,23 +235,26 @@ void * thread_server(void *arg)
             case SEARCH_Y:
                 criteria = current.inf.hdr;
                 n_fetched = search_h(arr, criteria, fetched, arr_size);
-                sprinth_arr(fetched, n_fetched, message_block);
+                if (n_fetched < 1) {
+                    sprintf(message_block, "0 books matched criteria.\n");
+                } else {
+                    sprinth_arr(fetched, n_fetched, message_block);
+                }
             default:
                 break;
         }
 
         sprintf(mig, "%d %d", (int)type, n_blocks);
         /* send mig */
-        //puts(mig);
         send(client_sock, mig, strlen(mig), 0);
         /* send echo */
-        //puts(message_block);
         send(client_sock, message_block, strlen(message_block), 0);
+        /* pauza obavezna */
+        usleep(100000);
+        memset(message_block, 0, 1025 * sizeof (char));
         /* send blocks (if download) */
         for (i = 0; i < n_blocks; ++i) {
             strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
-            
-            //puts(message_block);
             send(client_sock, message_block, strlen(message_block), 0);
             message_block[1024] = 0;
         }

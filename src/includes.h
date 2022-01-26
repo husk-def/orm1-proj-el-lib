@@ -20,6 +20,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h> //inet_addr
 #include <pthread.h>
+#include <unistd.h>
 
 #define TCP_SUBSTRING_LEN (10)
 

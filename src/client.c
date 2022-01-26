@@ -24,7 +24,7 @@ typedef enum
     SEARCH_Y,
 } instr_t;
 
-int main()
+int main(int argc, char*argv[])
 {
     int sock;
     //int len;
@@ -40,15 +40,27 @@ int main()
     char path[72];
     FILE *fp;
 
+    /*Loradmi*/
+    if(!(argc == 3)) {
+        printf("Too many or too few arguments!");
+        return -1;
+    }
+    /********/
+ 
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1)
     {
         printf("Could not create socket");
     }
     puts("Socket created");
-    server.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server.sin_addr.s_addr = inet_addr(argv[1]);
     server.sin_family = AF_INET;
-    server.sin_port = htons(DEFAULT_PORT);
+    server.sin_port = htons(atoi(argv[2]));
+
+    /*Loradmi*/
+    printf("Server address: %s\n", inet_ntoa(server.sin_addr));
+    printf("Server port: %u\n", ntohs(server.sin_port));
+    /********/
 
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
         perror("connect failed. Error");

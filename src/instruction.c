@@ -19,13 +19,13 @@ char instr_regex[10][90] =
     /* download regex */                  
     "^downl [0-9]{1,9}[ \t\n]*$",
     /* search regex */
-    "^search i:[0-9]{1,9} a:[a-z]{1,16} [a-z]{1,16} t:[a-z]{1,16} y:[0-9]{1,9}[ \t\n]*$",
+    "^search i:[0-9]{1,9} a:[a-z]{1,15} [a-z]{1,15} t:[a-z]{1,15} y:[0-9]{1,9}[ \t\n]*$",
     /* search by id regex */
     "^search i:[0-9]{1,9}[ \t\n]*$",
     /* search by author regex */
-    "^search a:[a-z]{1,16} [a-z]{1,16}[ \t\n]*$",
+    "^search a:[a-z]{1,15} [a-z]{1,15}[ \t\n]*$",
     /* search by trunc_name regex */
-    "^search t:[a-z]{1,16}[ \t\n]*$",
+    "^search t:[a-z]{1,15}[ \t\n]*$",
     /* search by year regex */
     "^search y:[0-9]{1,9}[ \t\n]*$",
 };

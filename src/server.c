@@ -43,7 +43,8 @@ int main()
     init_users(active_users, N_USERS);
     
     printf("\n");
-    system("nmcli -p device show | grep \"IP4.ADDR\" | head -1");
+    //system("nmcli -p device show | grep \"IP4.ADDR\" | head -1");
+    system("hostname -I");
     printf("\n");
 
     if (pthread_mutex_init(&lock, NULL) != 0) {
@@ -246,17 +247,20 @@ void * thread_server(void *arg)
 
         sprintf(mig, "%d %d", (int)type, n_blocks);
         /* send mig */
+        usleep(10000);
         send(client_sock, mig, strlen(mig), 0);
         /* send echo */
+        usleep(10000);
         send(client_sock, message_block, strlen(message_block), 0);
         /* pauza obavezna */
-        usleep(100000);
+        usleep(10000);
         memset(message_block, 0, 1025 * sizeof (char));
         /* send blocks (if download) */
         for (i = 0; i < n_blocks; ++i) {
             strncpy(message_block, (book + i * 1023 * sizeof (char)), 1023);
             send(client_sock, message_block, strlen(message_block), 0);
             message_block[1024] = 0;
+            usleep(10000);
         }
         //mig[0] = 0;
         memset(mig, 0, 20 * sizeof (char));

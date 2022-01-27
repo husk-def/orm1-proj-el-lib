@@ -6,10 +6,10 @@
 #include <stdio.h>
 
 typedef struct { 
-    char name[50];
+    char name[30];
     int id; 
-    char author[50]; 
-    char trunc_name[50]; 
+    char author[36]; 
+    char trunc_name[16]; 
     int year; 
 } Header;
 

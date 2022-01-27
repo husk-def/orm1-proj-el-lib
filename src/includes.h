@@ -2,9 +2,11 @@
 #ifndef INCLUDES_H
 #define INCLUDES_H
 
-#include "search.h"
-#include "parse.h"
+
+
 #include "header.h"
+#include "parse.h"
+#include "search.h"
 #include "download_server.h"
 #include "download_client.h"
 #include "instruction.h"
@@ -21,6 +23,7 @@
 #include <arpa/inet.h> //inet_addr
 #include <pthread.h>
 #include <unistd.h>
+#include <signal.h>
 
 #define TCP_SUBSTRING_LEN (10)
 

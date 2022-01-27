@@ -1,13 +1,5 @@
 
-#include "colors.h"
 #include "includes.h"
-#include "instruction.h"
-#include "user.h"
-#include <arpa/inet.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <ifaddrs.h>
 
 #define DEFAULT_PORT 27015
 #define N_USERS 2
@@ -16,6 +8,7 @@ Header arr[30];
 int arr_size;
 User active_users[N_USERS];
 pthread_mutex_t lock;
+int socket_desc;
 
 void * thread_server(void *arg);
 
@@ -30,9 +23,18 @@ static inline int is_init(const User *u)
     }
 }
 
+void int_handler()
+{
+    printf("closing socket...\n");
+    close(socket_desc);
+    printf("destroying mutex...\n");
+    pthread_mutex_destroy(&lock);
+    printf("closing threads...\n");
+    exit(0);
+}
+
 int main()
 {
-    int socket_desc;
     int c;
     int i;
     int client_sock[N_USERS];
@@ -40,10 +42,12 @@ int main()
     struct sockaddr_in client[N_USERS];
     pthread_t client_th[N_USERS];
 
+    signal(SIGINT, int_handler);
+
     init_users(active_users, N_USERS);
+
     
     printf("\n");
-    //system("nmcli -p device show | grep \"IP4.ADDR\" | head -1");
     system("hostname -I");
     printf("\n");
 
@@ -89,6 +93,9 @@ int main()
     for (i = 0; i < N_USERS; ++i) {
         pthread_join(client_th[i], NULL);
     }
+
+    close(socket_desc);
+    pthread_mutex_destroy(&lock);
 
     return 0;
 }
@@ -145,6 +152,7 @@ void * thread_server(void *arg)
                 pthread_mutex_unlock(&lock);
                 init_user(&this_user);
             }
+            free(message_block);
             return (void *)0;
         } else if (read_size == -1) {
             puts("recv failed");

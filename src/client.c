@@ -28,10 +28,8 @@ typedef enum
 int main(int argc, char*argv[])
 {
     int sock;
-    //int len;
     int read_size;
     int n_blocks;
-    //instr_t current_instr;
     int current_instr;
     struct sockaddr_in server;
     char message_block[1024];
@@ -41,13 +39,10 @@ int main(int argc, char*argv[])
     char path[75];
     FILE *fp;
 
-    /*Loradmi*/
     if(!(argc == 3)) {
-        //printf("Too many or too few arguments!");
         puts("client [IP_ADDR] [SOCK]");
         return -1;
     }
-    /********/
  
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1) {
@@ -58,10 +53,8 @@ int main(int argc, char*argv[])
     server.sin_family = AF_INET;
     server.sin_port = htons(atoi(argv[2]));
 
-    /*Loradmi*/
     printf("Server address: %s\n", inet_ntoa(server.sin_addr));
     printf("Server port: %u\n", ntohs(server.sin_port));
-    /********/
 
     if (connect(sock, (struct sockaddr *)&server, sizeof(server)) < 0) {
         perror("connect failed. Error");
@@ -70,11 +63,7 @@ int main(int argc, char*argv[])
     puts("Connected\n");
 
     while (1) {
-        //printf("%s", user);
-        //read_size = recv(sock, message_block, 19, 0);
-        //message_block[read_size] = 0;
         puts("******************************************************************");
-
         printf("%s", user);
         fgets(out, 199, stdin);
         if (out[0] == 'n') break;
@@ -85,6 +74,7 @@ int main(int argc, char*argv[])
         /* receive first echo - mig */
         memset(message_block, 0, 1024 * sizeof (char));
         read_size = recv(sock, message_block, 1023, 0);
+        if (read_size == 0) goto klouz;
         printf("read_size: %d\n", read_size);
         message_block[read_size] = 0;
         sscanf(message_block, "%d %d", &current_instr, &n_blocks);
@@ -93,6 +83,7 @@ int main(int argc, char*argv[])
         /* receive second echo - instruction response */
         memset(message_block, 0, 1024 * sizeof (char));
         read_size = recv(sock, message_block, 1023, 0);
+        if (read_size == 0) goto klouz;
         printf("read_size: %d\n", read_size);
         message_block[read_size] = 0;
         
@@ -114,6 +105,7 @@ int main(int argc, char*argv[])
             memset(message_block, 0, 1024 * sizeof (char));
             while (n_blocks-- > 0) {
                 read_size = recv(sock, message_block, 1023, 0);
+                if (read_size == 0) goto klouz;
                 printf("read_size: %d\n", read_size);
                 message_block[read_size] = 0;
                 if (fp != NULL) {
@@ -121,7 +113,6 @@ int main(int argc, char*argv[])
                 } else {
                     printf("%s", message_block);
                 }
-                //message_block[0] = 0;
                 memset(message_block, 0, 1024 * sizeof (char));
             }
             if (fp != NULL) {
@@ -134,6 +125,7 @@ int main(int argc, char*argv[])
         printf(ANSI_COLOR_GREEN"%s\n"ANSI_COLOR_RESET, message_block);
         memset(message_block, 0, 1024 * sizeof (char));
     }
+klouz:
     close(sock);
     puts("socket closed.");
 }

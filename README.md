@@ -46,5 +46,7 @@ Sintaksa instrukcija:
  • downl [ID]
 
 Server se kompajluje komandom make server, te se pokrece iz ROOT-a projekta ./bin/server
+
 Klijent se kompajluje komandom make client, te se pokrece iz ROOT-a projekta ./bin/client
+
 Broj klijenta se podesava u server.c promenom vrednosti makro definicije N_USERS
